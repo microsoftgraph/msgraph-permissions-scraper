@@ -18,8 +18,14 @@ namespace PermissionsScrapper
     {
         static string _scopesDescriptionsJson = null;
 
+        /// <summary>
+        /// Timer function that fetches permissions descriptions from a Service Principal
+        /// and uploads them to a GitHub repo at specified times.
+        /// </summary>
+        /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
+        /// <param name="log"></param>
         [FunctionName("DescriptionsScrapper")]
-        public static void Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
             try
             {
@@ -35,7 +41,7 @@ namespace PermissionsScrapper
                     {
                         _scopesDescriptionsJson = scopesDescriptionsJson;
 
-                        // Save file to directory/call API with json file to upload to GitHub
+                        // TODO: Call GitHub API with json file to upload to devx-content-repo
                     }
                 }
                 else
@@ -45,10 +51,15 @@ namespace PermissionsScrapper
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception occurred: {ex.InnerException.Message ?? ex.Message}\r\n Time of occurrence {DateTime.Now}");
+                log.LogInformation($"Exception occurred: {ex.InnerException.Message ?? ex.Message}\r\n Time of occurrence: {DateTime.Now}");
             }
         }
 
+        /// <summary>
+        /// Gets authentication to a protected Web API.
+        /// </summary>
+        /// <param name="config">The application configuration settings.</param>
+        /// <returns>An authentiction result, if successful.</returns>
         private static AuthenticationResult GetAuthentication(ApplicationConfig config)
         {
             IConfidentialClientApplication app;
@@ -70,6 +81,12 @@ namespace PermissionsScrapper
             }
         }
 
+        /// <summary>
+        /// Retrieves permissions and their descriptions from a Service Principal
+        /// </summary>
+        /// <param name="config">The application configuration settings.</param>
+        /// <param name="result">The JSON response of the permissions and their descriptions retrieved from the Service Prinicpal.</param>
+        /// <returns></returns>
         private static string GetScopesDescriptionsJson(ApplicationConfig config, AuthenticationResult result)
         {
             try
@@ -82,13 +99,12 @@ namespace PermissionsScrapper
 
                 var cleanedSpJson = CleanJsonData(spJson, config);
 
-
                 // Retrieve the respective scopes
                 var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value");
 
                 var scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
 
-                foreach (var item in config.ScopesNamesList)
+                foreach (var item in config.ScopesNames)
                 {
                     var scopeDescriptions = spValue.First.Value<JArray>(item).ToObject<List<Dictionary<string, object>>>();
                     scopesDescriptions[item] = scopeDescriptions;
@@ -102,6 +118,12 @@ namespace PermissionsScrapper
             }
         }
 
+        /// <summary>
+        /// Applies regex patterns to clean up the Service Principal JSON response data
+        /// </summary>
+        /// <param name="spJson">The Service Principal JSON response data.</param>
+        /// <param name="config">The application configuration settings.</param>
+        /// <returns></returns>
         private static string CleanJsonData(string spJson, ApplicationConfig config)
         {
             string cleanedSpJson = spJson;
