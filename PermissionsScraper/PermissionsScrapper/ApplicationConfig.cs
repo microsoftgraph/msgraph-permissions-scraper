@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace PermissionsScrapper
+namespace PermissionsScraper
 {
     /// <summary>
     /// Describes the application configuration settings
@@ -79,9 +79,9 @@ namespace PermissionsScrapper
             IConfigurationRoot Configuration;
 
             var builder = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile(path, optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables();
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(path, optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
 
             Configuration = builder.Build();
             return Configuration.Get<ApplicationConfig>();
