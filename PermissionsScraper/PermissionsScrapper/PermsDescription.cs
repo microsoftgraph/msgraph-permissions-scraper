@@ -22,7 +22,7 @@ namespace PermissionsScraper
         /// and uploads them to a GitHub repo at specified times.
         /// </summary>
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
-        /// <param name="log"></param>
+        /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
         public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
@@ -71,15 +71,8 @@ namespace PermissionsScraper
 
             string[] scopes = new string[] { $"{config.ApiUrl}.default" };
 
-            try
-            {
-                return app.AcquireTokenForClient(scopes)
-               .ExecuteAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return app.AcquireTokenForClient(scopes)
+              .ExecuteAsync().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -90,44 +83,37 @@ namespace PermissionsScraper
         /// <returns></returns>
         private static string GetScopesDescriptionsJson(ApplicationConfig config, AuthenticationResult result)
         {
-            try
-            {
-                var spJson = ProtectedApiCallHelper
+            var spJson = ProtectedApiCallHelper
                     .CallWebApiAsync($"{config.ApiUrl}{config.ApiVersions[0]}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'", result.AccessToken)
                     .GetAwaiter().GetResult(); // fetch for v1.0 ; no business case for fetching for beta yet
 
-                if (string.IsNullOrEmpty(spJson))
-                {
-                    return null;
-                }
-
-                var cleanedSpJson = CleanJsonData(spJson, config);
-
-                // Retrieve the top level scope dictionary
-                var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value"); // value --> top level dictionary key
-
-                var scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
-
-                if (spValue == null)
-                {
-                    return null;
-                }
-
-                /* Fetch permissions defined in the second level dictionaries,
-                   e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
-                */
-                foreach (var item in config.ScopesNames)
-                {
-                    var scopeDescriptions = spValue.First.Value<JArray>(item).ToObject<List<Dictionary<string, object>>>();
-                    scopesDescriptions[item] = scopeDescriptions;
-                }
-
-                return JsonConvert.SerializeObject(scopesDescriptions, Formatting.Indented);
-            }
-            catch (Exception ex)
+            if (string.IsNullOrEmpty(spJson))
             {
-                throw ex;
+                return null;
             }
+
+            var cleanedSpJson = CleanJsonData(spJson, config);
+
+            // Retrieve the top level scope dictionary
+            var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value"); // value --> top level dictionary key
+
+            var scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+
+            if (spValue == null)
+            {
+                return null;
+            }
+
+            /* Fetch permissions defined in the second level dictionaries,
+               e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
+            */
+            foreach (var item in config.ScopesNames)
+            {
+                var scopeDescriptions = spValue.First.Value<JArray>(item).ToObject<List<Dictionary<string, object>>>();
+                scopesDescriptions[item] = scopeDescriptions;
+            }
+
+            return JsonConvert.SerializeObject(scopesDescriptions, Formatting.Indented);
         }
 
         /// <summary>
