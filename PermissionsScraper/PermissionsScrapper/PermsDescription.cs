@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,7 @@ using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace PermissionsScrapper
+namespace PermissionsScraper
 {
     public static class PermsDescription
     {
@@ -24,7 +23,7 @@ namespace PermissionsScrapper
         /// </summary>
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
         /// <param name="log"></param>
-        [FunctionName("DescriptionsScrapper")]
+        [FunctionName("DescriptionsScraper")]
         public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
             try
@@ -37,21 +36,23 @@ namespace PermissionsScrapper
                 {
                     var scopesDescriptionsJson = GetScopesDescriptionsJson(config, result);
 
-                    if (!scopesDescriptionsJson.Equals(_scopesDescriptionsJson, StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrEmpty(scopesDescriptionsJson))
                     {
-                        _scopesDescriptionsJson = scopesDescriptionsJson;
-
-                        // TODO: Call GitHub API with json file to upload to devx-content-repo
+                        if (!scopesDescriptionsJson.Equals(_scopesDescriptionsJson, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _scopesDescriptionsJson = scopesDescriptionsJson;
+                            // TODO: Call GitHub API with json file to upload to devx-content-repo
+                        }
                     }
                 }
                 else
                 {
-                    log.LogInformation($"Failed to get authentication at: {DateTime.Now}");
+                    log.LogInformation($"Failed to get authentication at: {DateTime.UtcNow}");
                 }
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception occurred: {ex.InnerException.Message ?? ex.Message}\r\n Time of occurrence: {DateTime.Now}");
+                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}\r\n Time of occurrence: {DateTime.UtcNow}");
             }
         }
 
@@ -59,7 +60,7 @@ namespace PermissionsScrapper
         /// Gets authentication to a protected Web API.
         /// </summary>
         /// <param name="config">The application configuration settings.</param>
-        /// <returns>An authentiction result, if successful.</returns>
+        /// <returns>An authentication result, if successful.</returns>
         private static AuthenticationResult GetAuthentication(ApplicationConfig config)
         {
             IConfidentialClientApplication app;
@@ -91,19 +92,30 @@ namespace PermissionsScrapper
         {
             try
             {
-                var httpClient = new HttpClient();
-                var apiCaller = new ProtectedApiCallHelper(httpClient);
-                var spJson = apiCaller
+                var spJson = ProtectedApiCallHelper
                     .CallWebApiAsync($"{config.ApiUrl}{config.ApiVersions[0]}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'", result.AccessToken)
                     .GetAwaiter().GetResult(); // fetch for v1.0 ; no business case for fetching for beta yet
 
+                if (string.IsNullOrEmpty(spJson))
+                {
+                    return null;
+                }
+
                 var cleanedSpJson = CleanJsonData(spJson, config);
 
-                // Retrieve the respective scopes
-                var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value");
+                // Retrieve the top level scope dictionary
+                var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value"); // value --> top level dictionary key
 
                 var scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
 
+                if (spValue == null)
+                {
+                    return null;
+                }
+
+                /* Fetch permissions defined in the second level dictionaries,
+                   e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
+                */
                 foreach (var item in config.ScopesNames)
                 {
                     var scopeDescriptions = spValue.First.Value<JArray>(item).ToObject<List<Dictionary<string, object>>>();
