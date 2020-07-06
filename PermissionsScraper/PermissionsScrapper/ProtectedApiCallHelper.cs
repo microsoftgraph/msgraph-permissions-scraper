@@ -8,38 +8,32 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace PermissionsScrapper
+namespace PermissionsScraper
 {
     /// <summary>
     /// Helper class to call a protected API and returns the result of the call
     /// </summary>
-    public class ProtectedApiCallHelper
+    public static class ProtectedApiCallHelper
     {
-        public ProtectedApiCallHelper(HttpClient httpClient)
-        {
-            HttpClient = httpClient;
-        }
-
-        protected HttpClient HttpClient { get; private set; }
-
         /// <summary>
         /// Calls a protected Web API
         /// </summary>
         /// <param name="webApiUrl">Url of the Web API to call</param>
         /// <param name="accessToken">Access token used as a bearer security token to call the Web API</param>
         /// <returns>The response of the call to the Web API</returns>
-        public async Task<string> CallWebApiAsync(string webApiUrl, string accessToken)
+        public static async Task<string> CallWebApiAsync(string webApiUrl, string accessToken)
         {
             if (!string.IsNullOrEmpty(accessToken))
             {
-                var defaultRequestHeaders = HttpClient.DefaultRequestHeaders;
+                var httpClient = new HttpClient();
+                var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
                 if (defaultRequestHeaders.Accept == null || !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
                 {
-                    HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 }
                 defaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
 
-                HttpResponseMessage response = await HttpClient.GetAsync(webApiUrl);
+                HttpResponseMessage response = await httpClient.GetAsync(webApiUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
