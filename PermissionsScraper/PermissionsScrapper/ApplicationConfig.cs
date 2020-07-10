@@ -37,6 +37,8 @@ namespace PermissionsScraper
 
         public string ServicePrincipalId { get; set; }
 
+        public string TopLevelDictionaryName { get; set; }
+
         /// <summary>
         /// The scope names to retrieve from the Service Principal
         /// </summary>
