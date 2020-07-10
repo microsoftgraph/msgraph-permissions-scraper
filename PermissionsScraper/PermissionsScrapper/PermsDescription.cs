@@ -15,7 +15,8 @@ namespace PermissionsScraper
 {
     public static class PermsDescription
     {
-        static string _scopesDescriptionsJson = null;
+        private static HashSet<string> _uniqueScopes; // for ensuring unique scopes are populated
+        private static Dictionary<string, List<Dictionary<string, object>>> _scopesDescriptions; // will hold scopes descriptions from the Service Principal
 
         /// <summary>
         /// Timer function that fetches permissions descriptions from a Service Principal
@@ -34,16 +35,24 @@ namespace PermissionsScraper
 
                 if (result != null)
                 {
-                    var scopesDescriptionsJson = GetScopesDescriptionsJson(config, result);
-
-                    if (!string.IsNullOrEmpty(scopesDescriptionsJson))
+                    if (config.ApiVersions?.Length > 0)
                     {
-                        if (!scopesDescriptionsJson.Equals(_scopesDescriptionsJson, StringComparison.OrdinalIgnoreCase))
+                        _uniqueScopes = new HashSet<string>();
+                        _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+
+                        foreach (var item in config.ApiVersions)
                         {
-                            _scopesDescriptionsJson = scopesDescriptionsJson;
-                            // TODO: Call GitHub API with json file to upload to devx-content-repo
+                            PopulateScopesDescriptions(config, result, item);
                         }
                     }
+
+                    var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented);
+
+                    /* TODO:
+                     * Fetch permissions descriptions from GitHub
+                     * Compare GitHub permissions descriptions to Service Principal permissions descriptions retrieved above
+                     * PR into GitHub if there is a variance between the two
+                     */
                 }
                 else
                 {
@@ -76,44 +85,65 @@ namespace PermissionsScraper
         }
 
         /// <summary>
-        /// Retrieves permissions and their descriptions from a Service Principal
+        /// Retrieves and populates permissions descriptions from a Service Principal.
         /// </summary>
         /// <param name="config">The application configuration settings.</param>
         /// <param name="result">The JSON response of the permissions and their descriptions retrieved from the Service Prinicpal.</param>
-        /// <returns></returns>
-        private static string GetScopesDescriptionsJson(ApplicationConfig config, AuthenticationResult result)
+        /// <param name="version">The version of the API from which to fetch the scopes descriptions from the Service Principal.</param>
+        private static void PopulateScopesDescriptions(ApplicationConfig config,
+                                                       AuthenticationResult result,
+                                                       string version)
         {
+            string webApiUrl = $"{config.ApiUrl}{version}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'";
             var spJson = ProtectedApiCallHelper
-                    .CallWebApiAsync($"{config.ApiUrl}{config.ApiVersions[0]}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'", result.AccessToken)
-                    .GetAwaiter().GetResult(); // fetch for v1.0 ; no business case for fetching for beta yet
+                    .CallWebApiAsync(webApiUrl, result.AccessToken)
+                    .GetAwaiter().GetResult();
 
             if (string.IsNullOrEmpty(spJson))
             {
-                return null;
+                throw new ArgumentNullException(nameof(spJson), $"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
             }
 
             var cleanedSpJson = CleanJsonData(spJson, config);
 
             // Retrieve the top level scope dictionary
-            var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>("value"); // value --> top level dictionary key
-
-            var scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+            var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>(config.TopLevelDictionaryName);
 
             if (spValue == null)
             {
-                return null;
+                throw new ArgumentNullException(nameof(config.TopLevelDictionaryName), $"Attempt to retrieve the top-level dictionary returned empty data." +
+                    $"Name: {config.TopLevelDictionaryName}");
             }
 
-            /* Fetch permissions defined in the second level dictionaries,
-               e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
-            */
-            foreach (var item in config.ScopesNames)
+            /* Fetch permissions defined in the second level dictionary(ies),
+             * e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
+             */
+            foreach (var scopeName in config.ScopesNames)
             {
-                var scopeDescriptions = spValue.First.Value<JArray>(item).ToObject<List<Dictionary<string, object>>>();
-                scopesDescriptions[item] = scopeDescriptions;
-            }
+                // Retrieve all scopes descriptions for a given 2nd level dictionary retrieved from the Service Principal
+                var scopeDescriptions = spValue.First.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
 
-            return JsonConvert.SerializeObject(scopesDescriptions, Formatting.Indented);
+                // Add a key to the reference dictionary (if not present)
+                if (!_scopesDescriptions.ContainsKey(scopeName))
+                {
+                    _scopesDescriptions.Add(scopeName, new List<Dictionary<string, object>>());
+                }
+
+                /* Add each of the scope description from SP to the current key in the
+                 * reference dictionary
+                 */
+                foreach (var scopeDesc in scopeDescriptions)
+                {
+                    /* Add only unique scopes (there might be duplicated scopes in both v1.0 and beta)
+                     * Uniqueness identified by id of the scope description
+                     */
+                    bool newScope = _uniqueScopes.Add(scopeDesc["id"].ToString());
+                    if (newScope)
+                    {
+                        _scopesDescriptions[scopeName].Add(scopeDesc);
+                    }
+                }
+            }
         }
 
         /// <summary>
