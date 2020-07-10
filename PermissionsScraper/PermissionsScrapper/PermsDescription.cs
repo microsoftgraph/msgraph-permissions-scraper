@@ -151,7 +151,7 @@ namespace PermissionsScraper
         /// </summary>
         /// <param name="spJson">The Service Principal JSON response data.</param>
         /// <param name="config">The application configuration settings.</param>
-        /// <returns></returns>
+        /// <returns>The Service Principal JSON response data with the regex transformations applied.</returns>
         private static string CleanJsonData(string spJson, ApplicationConfig config)
         {
             string cleanedSpJson = spJson;
