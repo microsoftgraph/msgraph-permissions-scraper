@@ -5,11 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using GitHubRepo.ContentUtility.Common;
+using GitHubRepo.ContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using GitHubRepoAppConfig = GitHubRepo.ContentUtility.Common.ApplicationConfig;
 
 namespace PermissionsScraper
 {
@@ -31,37 +34,73 @@ namespace PermissionsScraper
             {
                 ApplicationConfig config = ApplicationConfig.ReadFromJsonFile("local.settings.json");
 
+                log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
                 var result = GetAuthentication(config);
 
-                if (result != null)
+                if (result == null)
                 {
-                    if (config.ApiVersions?.Length > 0)
-                    {
-                        _uniqueScopes = new HashSet<string>();
-                        _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
-
-                        foreach (var item in config.ApiVersions)
-                        {
-                            PopulateScopesDescriptions(config, result, item);
-                        }
-                    }
-
-                    var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented);
-
-                    /* TODO:
-                     * Fetch permissions descriptions from GitHub
-                     * Compare GitHub permissions descriptions to Service Principal permissions descriptions retrieved above
-                     * PR into GitHub if there is a variance between the two
-                     */
+                    log.LogInformation($"Failed to get authentication into the Web API. Time: {DateTime.UtcNow}");
+                    return;
                 }
-                else
+                log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
+
+                if (config.ApiVersions?.Length > 0)
                 {
-                    log.LogInformation($"Failed to get authentication at: {DateTime.UtcNow}");
+                    _uniqueScopes = new HashSet<string>();
+                    _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+
+                    foreach (var item in config.ApiVersions)
+                    {
+                        log.LogInformation($"Fetching Service Principal permissions descriptions for {item}. Time: {DateTime.UtcNow}");
+                        PopulateScopesDescriptions(config, result, item);
+                        log.LogInformation($"Finished fetching Service Principal permissions descriptions for {item}. Time: {DateTime.UtcNow}");
+                    }
+                }
+
+                var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented);
+
+                // Fetch permissions descriptions from GitHub repo
+                var contentReader = new BlobContentReader();
+                var gitHubAppConfig = new GitHubRepoAppConfig
+                {
+                    GitHubAppId = config.GitHubAppId,
+                    GitHubOrganization = config.GitHubOrganization,
+                    GitHubAppName = config.GitHubAppName,
+                    GitHubRepoName = config.GitHubRepoName,
+                    ReferenceBranch = config.ReferenceBranch,
+                    FileContentPath = config.FileContentPath,
+                    WorkingBranch = config.WorkingBranch,
+                    Reviewers = config.Reviewers,
+                    PullRequestTitle = config.PullRequestTitle,
+                    PullRequestBody = config.PullRequestBody,
+                    PullRequestLabel = config.PullRequestLabel,
+                    PullRequestAssignee = config.PullRequestAssignee,
+                    CommitMessage = config.CommitMessage,
+                    TreeItemMode = Enums.TreeItemMode.Blob
+                };
+
+                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}'. Time: {DateTime.UtcNow}");
+                var repoScopes = contentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, config.GitHubAppKey).GetAwaiter().GetResult();
+                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}'. Time: {DateTime.UtcNow}");
+
+                // Compare GitHub permissions descriptions to Service Principal permissions descriptions
+                if (!servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Push Service Principals to GitHub repo
+                    log.LogInformation($"Creating PR for updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+                    gitHubAppConfig.FileContent = servicePrincipalScopes;
+
+                    var contentWriter = new BlobContentWriter();
+
+                    contentWriter.WriteToRepositoryAsync(gitHubAppConfig, config.GitHubAppKey).GetAwaiter().GetResult();
+                    log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
                 }
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}\r\n Time of occurrence: {DateTime.UtcNow}");
+                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}\r\nTime: {DateTime.UtcNow}");
             }
         }
 
