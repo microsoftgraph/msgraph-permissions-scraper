@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace PermissionsScraper
+namespace PermissionsScraper.Helpers
 {
     /// <summary>
     /// Helper class to call a protected API and returns the result of the call

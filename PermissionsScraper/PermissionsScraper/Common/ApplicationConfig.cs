@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace PermissionsScraper
+namespace PermissionsScraper.Common
 {
     /// <summary>
     /// Describes the application configuration settings
@@ -67,6 +67,11 @@ namespace PermissionsScraper
                 _regexReplacements = value;
             }
         }
+
+        /// <summary>
+        /// Versions of the target API
+        /// </summary>
+        public string[] ApiVersions { get; set; }
 
         /// <summary>
         /// The name of the GitHub app
@@ -137,11 +142,6 @@ namespace PermissionsScraper
         /// Pull request label
         /// </summary>
         public string PullRequestLabel { get; set; }
-
-        /// <summary>
-        /// Versions of the target API
-        /// </summary>
-        public string[] ApiVersions { get; set; }
 
         /// <summary>
         /// Reads the app configurations from a json file or environment variables.

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using GitHubRepo.ContentUtility.Common;
 using GitHubRepo.ContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
@@ -12,11 +11,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PermissionsScraper.Helpers;
+using PermissionsScraper.Services;
+using PermissionsAppConfig =  PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubRepo.ContentUtility.Common.ApplicationConfig;
 
-namespace PermissionsScraper
+namespace PermissionsScraper.Triggers
 {
-    public static class PermsDescription
+    public static class DescriptionsScraper
     {
         private static HashSet<string> _uniqueScopes; // for ensuring unique scopes are populated
         private static Dictionary<string, List<Dictionary<string, object>>> _scopesDescriptions; // will hold scopes descriptions from the Service Principal
@@ -28,14 +30,14 @@ namespace PermissionsScraper
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
         /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
         {
             try
             {
-                ApplicationConfig config = ApplicationConfig.ReadFromJsonFile("local.settings.json");
+                PermissionsAppConfig config = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
 
                 log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
-                var result = GetAuthentication(config);
+                var result = AuthService.GetAuthentication(config);
 
                 if (result == null)
                 {
@@ -100,27 +102,8 @@ namespace PermissionsScraper
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}\r\nTime: {DateTime.UtcNow}");
+                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}. Time: {DateTime.UtcNow}");
             }
-        }
-
-        /// <summary>
-        /// Gets authentication to a protected Web API.
-        /// </summary>
-        /// <param name="config">The application configuration settings.</param>
-        /// <returns>An authentication result, if successful.</returns>
-        private static AuthenticationResult GetAuthentication(ApplicationConfig config)
-        {
-            IConfidentialClientApplication app;
-            app = ConfidentialClientApplicationBuilder.Create(config.ClientId)
-                  .WithClientSecret(config.ClientSecret)
-                  .WithAuthority(new Uri(config.Authority))
-                  .Build();
-
-            string[] scopes = new string[] { $"{config.ApiUrl}.default" };
-
-            return app.AcquireTokenForClient(scopes)
-              .ExecuteAsync().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -129,7 +112,7 @@ namespace PermissionsScraper
         /// <param name="config">The application configuration settings.</param>
         /// <param name="result">The JSON response of the permissions and their descriptions retrieved from the Service Prinicpal.</param>
         /// <param name="version">The version of the API from which to fetch the scopes descriptions from the Service Principal.</param>
-        private static void PopulateScopesDescriptions(ApplicationConfig config,
+        private static void PopulateScopesDescriptions(PermissionsAppConfig config,
                                                        AuthenticationResult result,
                                                        string version)
         {
@@ -143,10 +126,10 @@ namespace PermissionsScraper
                 throw new ArgumentNullException(nameof(spJson), $"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
             }
 
-            var cleanedSpJson = CleanJsonData(spJson, config);
+            var spJsonResponse = PermissionsFormatHelper.FormatServicePrincipalResponse(spJson, config);
 
             // Retrieve the top level scope dictionary
-            var spValue = JsonConvert.DeserializeObject<JObject>(cleanedSpJson).Value<JArray>(config.TopLevelDictionaryName);
+            var spValue = JsonConvert.DeserializeObject<JObject>(spJsonResponse).Value<JArray>(config.TopLevelDictionaryName);
 
             if (spValue == null)
             {
@@ -183,26 +166,6 @@ namespace PermissionsScraper
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Applies regex patterns to clean up the Service Principal JSON response data
-        /// </summary>
-        /// <param name="spJson">The Service Principal JSON response data.</param>
-        /// <param name="config">The application configuration settings.</param>
-        /// <returns>The Service Principal JSON response data with the regex transformations applied.</returns>
-        private static string CleanJsonData(string spJson, ApplicationConfig config)
-        {
-            string cleanedSpJson = spJson;
-
-            foreach (var item in config.RegexPatterns)
-            {
-                Regex regex = new Regex(item.Value, RegexOptions.IgnoreCase);
-                var replacement = config.RegexReplacements[item.Key];
-                cleanedSpJson = regex.Replace(cleanedSpJson, replacement);
-            }
-
-            return cleanedSpJson;
         }
     }
 }
