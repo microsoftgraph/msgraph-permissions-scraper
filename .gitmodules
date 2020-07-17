@@ -1,0 +1,3 @@
+[submodule "Submodules/msgraph-github-content-utility"]
+	path = Submodules/msgraph-github-content-utility
+	url = https://github.com/microsoftgraph/msgraph-github-content-utility.git
