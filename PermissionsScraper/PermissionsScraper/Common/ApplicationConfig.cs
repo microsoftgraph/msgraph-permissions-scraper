@@ -136,12 +136,12 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// Pull request assignee
         /// </summary>
-        public string PullRequestAssignee { get; set; }
+        public List<string> PullRequestAssignees { get; set; }
 
         /// <summary>
         /// Pull request label
         /// </summary>
-        public string PullRequestLabel { get; set; }
+        public List<string> PullRequestLabels { get; set; }
 
         /// <summary>
         /// Reads the app configurations from a json file or environment variables.

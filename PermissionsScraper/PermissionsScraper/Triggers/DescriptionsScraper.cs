@@ -75,8 +75,8 @@ namespace PermissionsScraper.Triggers
                     Reviewers = config.Reviewers,
                     PullRequestTitle = config.PullRequestTitle,
                     PullRequestBody = config.PullRequestBody,
-                    PullRequestLabel = config.PullRequestLabel,
-                    PullRequestAssignee = config.PullRequestAssignee,
+                    PullRequestLabels = config.PullRequestLabel,
+                    PullRequestAssignees = config.PullRequestAssignee,
                     CommitMessage = config.CommitMessage,
                     TreeItemMode = Enums.TreeItemMode.Blob
                 };
