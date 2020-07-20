@@ -4,8 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using GitHubRepo.ContentUtility.Common;
-using GitHubRepo.ContentUtility.Operations;
+using GitHubContentUtility.Common;
+using GitHubContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
 using PermissionsAppConfig =  PermissionsScraper.Common.ApplicationConfig;
-using GitHubRepoAppConfig = GitHubRepo.ContentUtility.Common.ApplicationConfig;
+using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 
 namespace PermissionsScraper.Triggers
 {
