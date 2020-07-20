@@ -30,7 +30,7 @@ namespace PermissionsScraper.Triggers
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
         /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("0 */2 * * * *")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
             try
             {
