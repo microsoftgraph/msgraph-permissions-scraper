@@ -32,6 +32,8 @@ namespace PermissionsScraper.Triggers
         [FunctionName("DescriptionsScraper")]
         public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
+            log.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
+
             try
             {
                 PermissionsAppConfig config = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
@@ -75,8 +77,8 @@ namespace PermissionsScraper.Triggers
                     Reviewers = config.Reviewers,
                     PullRequestTitle = config.PullRequestTitle,
                     PullRequestBody = config.PullRequestBody,
-                    PullRequestLabels = config.PullRequestLabel,
-                    PullRequestAssignees = config.PullRequestAssignee,
+                    PullRequestLabels = config.PullRequestLabels,
+                    PullRequestAssignees = config.PullRequestAssignees,
                     CommitMessage = config.CommitMessage,
                     TreeItemMode = Enums.TreeItemMode.Blob
                 };
@@ -85,20 +87,38 @@ namespace PermissionsScraper.Triggers
                 var repoScopes = contentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, config.GitHubAppKey).GetAwaiter().GetResult();
                 log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}'. Time: {DateTime.UtcNow}");
 
+                log.LogInformation($"Comparing for new updates... Time: {DateTime.UtcNow}");
                 // Compare GitHub permissions descriptions to Service Principal permissions descriptions
                 if (!servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Push Service Principals to GitHub repo
-                    log.LogInformation($"Creating PR for updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
-                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
                     gitHubAppConfig.FileContent = servicePrincipalScopes;
 
-                    var contentWriter = new BlobContentWriter();
+                    // Push Service Principals to GitHub repo branch
+                    log.LogInformation($"Writing updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
+                    // Write the scopes to the working branch of the repo
+                    var contentWriter = new BlobContentWriter();
                     contentWriter.WriteToRepositoryAsync(gitHubAppConfig, config.GitHubAppKey).GetAwaiter().GetResult();
-                    log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+
+                    log.LogInformation($"Finished updating Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
+
+                    // Create PR
+                    log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
                         $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+
+                    var prCreator = new PullRequestCreator();
+                    prCreator.CreatePullRequestAsync(gitHubAppConfig, config.GitHubAppKey).GetAwaiter().GetResult();
+
+                    log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+
+                    log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
+
+                    return;
                 }
+                log.LogInformation($"No permissions descriptions update required. Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
             }
             catch (Exception ex)
             {
