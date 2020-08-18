@@ -8,14 +8,14 @@ using PermissionsScraper.Common;
 
 namespace PermissionsScraper.Services
 {
-    public static class AuthService
+    internal static class AuthService
     {
         /// <summary>
         /// Gets authentication to a protected Web API.
         /// </summary>
         /// <param name="config">The application configuration settings.</param>
         /// <returns>An authentication result, if successful.</returns>
-        public static AuthenticationResult GetAuthentication(ApplicationConfig config)
+        internal static AuthenticationResult GetAuthentication(ApplicationConfig config)
         {
             try
             {

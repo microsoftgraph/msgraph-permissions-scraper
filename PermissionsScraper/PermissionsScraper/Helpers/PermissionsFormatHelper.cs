@@ -7,7 +7,7 @@ using PermissionsScraper.Common;
 
 namespace PermissionsScraper.Helpers
 {
-    public static class PermissionsFormatHelper
+    internal static class PermissionsFormatHelper
     {
         /// <summary>
         /// Applies regex patterns to clean up the Service Principal JSON response data
@@ -15,7 +15,7 @@ namespace PermissionsScraper.Helpers
         /// <param name="spJsonResponse">The Service Principal JSON response data.</param>
         /// <param name="config">The application configuration settings.</param>
         /// <returns>The Service Principal JSON response data with the regex transformations applied.</returns>
-        public static string FormatServicePrincipalResponse(string spJsonResponse, ApplicationConfig config)
+        internal static string FormatServicePrincipalResponse(string spJsonResponse, ApplicationConfig config)
         {
             string cleanedSpJson = spJsonResponse;
 
