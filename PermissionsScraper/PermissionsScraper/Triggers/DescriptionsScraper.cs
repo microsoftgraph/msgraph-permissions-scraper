@@ -103,33 +103,30 @@ namespace PermissionsScraper.Triggers
                 if (servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
                 {
                     log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
-                }
-                else
-                {
-                    // Push Service Principal scopes to the GitHub repo working branch
-                    gitHubAppConfig.FileContent = servicePrincipalScopes;
-
-                    log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
-                        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
-
-                    BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
-
-                    log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
-                        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
-
-                    // Create PR
-                    log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
-                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
-
-                    PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
-
-                    log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
-                        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
-
-                    log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
-
                     return;
                 }
+
+                // Push Service Principal scopes to the GitHub repo working branch
+                gitHubAppConfig.FileContent = servicePrincipalScopes;
+
+                log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                    $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
+
+                BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+
+                log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                    $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
+
+                // Create PR
+                log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                    $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+
+                PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+
+                log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                    $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+
+                log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
             }
             catch (Exception ex)
             {
@@ -178,7 +175,7 @@ namespace PermissionsScraper.Triggers
 
                 if (scopeDescriptions == null)
                 {
-                    break;
+                    continue;
                 }
 
                 // Add a key to the reference dictionary (if not present)
