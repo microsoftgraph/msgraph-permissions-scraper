@@ -15,6 +15,7 @@ using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
 using PermissionsAppConfig =  PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
+using System.Linq;
 
 namespace PermissionsScraper.Triggers
 {
@@ -48,10 +49,10 @@ namespace PermissionsScraper.Triggers
                 }
                 log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
 
+                _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
                 if (permsAppConfig.ApiVersions?.Length > 0)
                 {
                     _uniqueScopes = new HashSet<string>();
-                    _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
 
                     foreach (string apiVersion in permsAppConfig.ApiVersions)
                     {
@@ -59,6 +60,13 @@ namespace PermissionsScraper.Triggers
                         PopulateScopesDescriptions(permsAppConfig, authResult, apiVersion);
                         log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
                     }
+                }
+
+                if (!_scopesDescriptions.Any())
+                {
+                    log.LogInformation($"{nameof(_scopesDescriptions)} dictionary returned empty data. " +
+                        $"Exiting function DescriptionsScraper Time: {DateTime.UtcNow}");
+                    return;
                 }
 
                 var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented);
@@ -92,7 +100,11 @@ namespace PermissionsScraper.Triggers
                     $"for new updates... Time: {DateTime.UtcNow}");
 
                 // Compare GitHub permissions descriptions to Service Principal permissions descriptions
-                if (!servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
+                if (servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
+                {
+                    log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
+                }
+                else
                 {
                     // Push Service Principal scopes to the GitHub repo working branch
                     gitHubAppConfig.FileContent = servicePrincipalScopes;
@@ -118,7 +130,6 @@ namespace PermissionsScraper.Triggers
 
                     return;
                 }
-                log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
             }
             catch (Exception ex)
             {
@@ -160,10 +171,15 @@ namespace PermissionsScraper.Triggers
             /* Fetch permissions defined in the second level dictionary(ies),
              * e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
              */
-            foreach (var scopeName in config.ScopesNames)
+            foreach (string scopeName in config.ScopesNames)
             {
                 // Retrieve all scopes descriptions for a given 2nd level dictionary retrieved from the Service Principal
                 var scopeDescriptions = spValue.First.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
+
+                if (scopeDescriptions == null)
+                {
+                    break;
+                }
 
                 // Add a key to the reference dictionary (if not present)
                 if (!_scopesDescriptions.ContainsKey(scopeName))
