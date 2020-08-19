@@ -17,23 +17,16 @@ namespace PermissionsScraper.Services
         /// <returns>An authentication result, if successful.</returns>
         internal static AuthenticationResult GetAuthentication(ApplicationConfig config)
         {
-            try
-            {
-                IConfidentialClientApplication app;
-                app = ConfidentialClientApplicationBuilder.Create(config.ClientId)
-                      .WithClientSecret(config.ClientSecret)
-                      .WithAuthority(new Uri(config.Authority))
-                      .Build();
+            IConfidentialClientApplication app;
+            app = ConfidentialClientApplicationBuilder.Create(config.ClientId)
+                  .WithClientSecret(config.ClientSecret)
+                  .WithAuthority(new Uri(config.Authority))
+                  .Build();
 
-                string[] scopes = new string[] { $"{config.ApiUrl}.default" };
+            string[] scopes = new string[] { $"{config.ApiUrl}.default" };
 
-                return app.AcquireTokenForClient(scopes)
-                  .ExecuteAsync().GetAwaiter().GetResult();
-            }
-            catch
-            {
-                throw;
-            }
+            return app.AcquireTokenForClient(scopes)
+              .ExecuteAsync().GetAwaiter().GetResult();
         }
     }
 }
