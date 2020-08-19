@@ -32,9 +32,9 @@ namespace PermissionsScraper.Helpers
                 throw new ArgumentNullException(nameof(accessToken), "Parameter cannot be null or empty");
             }
 
-            var httpClient = new HttpClient();
-            var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
-            if (defaultRequestHeaders.Accept == null || !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
+            HttpClient httpClient = new HttpClient();
+            HttpRequestHeaders defaultRequestHeaders = httpClient.DefaultRequestHeaders;
+            if (!defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
             {
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
