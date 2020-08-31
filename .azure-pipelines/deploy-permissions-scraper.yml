@@ -3,8 +3,16 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
 
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
 trigger:
-- master
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - .gitignore
+    - LICENSE
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
@@ -35,7 +43,7 @@ stages:
       inputs:
         command: 'build'
         projects: |
-          $(workingDirectory)/*.csproj
+          $(workingDirectory)/PermissionsScraper.csproj
         arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
 
     - task: ArchiveFiles@2
