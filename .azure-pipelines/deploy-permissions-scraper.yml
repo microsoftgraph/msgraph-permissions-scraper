@@ -14,6 +14,8 @@ trigger:
     - .gitignore
     - LICENSE
 
+pr: none
+
 variables:
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: '984f7c25-03a1-456c-a4c0-4b97f9d61962'
