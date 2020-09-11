@@ -16,6 +16,7 @@ using PermissionsScraper.Services;
 using PermissionsAppConfig =  PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using System.Linq;
+using Octokit;
 
 namespace PermissionsScraper.Triggers
 {
@@ -69,7 +70,8 @@ namespace PermissionsScraper.Triggers
                     return;
                 }
 
-                var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented);
+                var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented)
+                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
 
                 // Fetch permissions descriptions from GitHub repo
                 var gitHubAppConfig = new GitHubRepoAppConfig
@@ -90,13 +92,15 @@ namespace PermissionsScraper.Triggers
                     TreeItemMode = Enums.TreeItemMode.Blob
                 };
 
-                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
+                    $"Time: {DateTime.UtcNow}");
 
                 var repoScopes = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
-                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
+                    $"Time: {DateTime.UtcNow}");
 
-                log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}' " +
+                log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}' " +
                     $"for new updates... Time: {DateTime.UtcNow}");
 
                 // Compare GitHub permissions descriptions to Service Principal permissions descriptions
@@ -127,6 +131,13 @@ namespace PermissionsScraper.Triggers
                     $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
 
                 log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
+            }
+            catch (ApiException ex)
+            {
+                foreach (var item in ex.ApiError.Errors)
+                {
+                    log.LogInformation($"Exception occurred: {item.Message} Time: {DateTime.UtcNow}");
+                }
             }
             catch (Exception ex)
             {
