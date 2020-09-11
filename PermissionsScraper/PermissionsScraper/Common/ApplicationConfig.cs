@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Configuration;
+using PermissionsScraper.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,6 +16,7 @@ namespace PermissionsScraper.Common
     /// </summary>
     public class ApplicationConfig
     {
+        private string _gitHubAppKey;
         private Dictionary<string, string> _regexReplacements;
 
         public string Instance { get; set; } = "https://login.microsoftonline.com/{0}";
@@ -25,7 +27,14 @@ namespace PermissionsScraper.Common
 
         public string ClientId { get; set; }
 
-        public string GitHubAppKey { get; set; }
+        public string GitHubAppKey
+        {
+            get => _gitHubAppKey;
+            set
+            {
+                _gitHubAppKey = value.FormatPrivateKey();
+            }
+        }
 
         public string Authority
         {
