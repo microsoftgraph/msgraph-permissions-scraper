@@ -130,7 +130,8 @@ namespace PermissionsScraper.Triggers
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message}. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message} Time: {DateTime.UtcNow}");
+                log.LogInformation($"Exception stack trace: {ex.StackTrace}");
             }
         }
 
