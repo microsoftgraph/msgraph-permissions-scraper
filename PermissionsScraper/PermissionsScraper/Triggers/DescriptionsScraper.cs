@@ -144,6 +144,7 @@ namespace PermissionsScraper.Triggers
                     }
                     return;
                 }
+
                 log.LogInformation($"Exception occurred: {ex.ApiError.Message} Time: {DateTime.UtcNow}");
             }
             catch (Exception ex)
