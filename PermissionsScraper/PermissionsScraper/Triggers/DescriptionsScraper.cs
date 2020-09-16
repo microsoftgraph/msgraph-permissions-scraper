@@ -95,6 +95,7 @@ namespace PermissionsScraper.Triggers
                 log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
 
+                // Fetch permissions descriptions from repo.
                 var repoScopes = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
@@ -110,12 +111,13 @@ namespace PermissionsScraper.Triggers
                     return;
                 }
 
-                // Push Service Principal scopes to the GitHub repo working branch
+                // Save the new Service Principal scopes
                 gitHubAppConfig.FileContent = servicePrincipalScopes;
 
                 log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
+                // Write permissions descriptions to repo.
                 BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
@@ -134,10 +136,16 @@ namespace PermissionsScraper.Triggers
             }
             catch (ApiException ex)
             {
-                foreach (var item in ex.ApiError.Errors)
+                if (ex.ApiError.Errors != null)
                 {
-                    log.LogInformation($"Exception occurred: {item.Message} Time: {DateTime.UtcNow}");
+                    foreach (var item in ex.ApiError.Errors)
+                    {
+                        log.LogInformation($"Exception occurred: {item.Message} Time: {DateTime.UtcNow}");
+                    }
+                    return;
                 }
+
+                log.LogInformation($"Exception occurred: {ex.ApiError.Message} Time: {DateTime.UtcNow}");
             }
             catch (Exception ex)
             {
