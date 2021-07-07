@@ -8,12 +8,11 @@ using GitHubContentUtility.Common;
 using GitHubContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
-using PermissionsAppConfig =  PermissionsScraper.Common.ApplicationConfig;
+using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using System.Linq;
 using Octokit;
@@ -22,8 +21,8 @@ namespace PermissionsScraper.Triggers
 {
     public static class DescriptionsScraper
     {
-        private static HashSet<string> _uniqueScopes; // for ensuring unique scopes are populated
-        private static Dictionary<string, List<Dictionary<string, object>>> _scopesDescriptions; // will hold scopes descriptions from the Service Principal
+        private static Dictionary<string, List<Dictionary<string, object>>> _spScopesDescriptions; // will hold permissions descriptions from the Service Principal
+        private static Dictionary<string, List<Dictionary<string, object>>> _githubScopesDescriptions; // will hold permissions descriptions from GitHub
 
         /// <summary>
         /// Timer function that fetches permissions descriptions from a Service Principal
@@ -32,15 +31,14 @@ namespace PermissionsScraper.Triggers
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
         /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("0 0 9 * * 1-5")]TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("0 0 9 * * 1-5")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
 
             try
             {
-                PermissionsAppConfig permsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
-
                 log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
+                PermissionsAppConfig permsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
                 var authResult = AuthService.GetAuthentication(permsAppConfig);
 
                 if (authResult == null)
@@ -50,28 +48,23 @@ namespace PermissionsScraper.Triggers
                 }
                 log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
 
-                _scopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+                _spScopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
                 if (permsAppConfig.ApiVersions?.Length > 0)
                 {
-                    _uniqueScopes = new HashSet<string>();
-
                     foreach (string apiVersion in permsAppConfig.ApiVersions)
                     {
                         log.LogInformation($"Fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
-                        PopulateScopesDescriptions(permsAppConfig, authResult, apiVersion);
+                        PopulatePermissionsDescriptions(permsAppConfig, authResult.AccessToken, apiVersion);
                         log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
                     }
                 }
 
-                if (!_scopesDescriptions.Any())
+                if (!_spScopesDescriptions.Any())
                 {
-                    log.LogInformation($"{nameof(_scopesDescriptions)} dictionary returned empty data. " +
+                    log.LogInformation($"{nameof(_spScopesDescriptions)} dictionary returned empty data. " +
                         $"Exiting function DescriptionsScraper Time: {DateTime.UtcNow}");
                     return;
                 }
-
-                var servicePrincipalScopes = JsonConvert.SerializeObject(_scopesDescriptions, Formatting.Indented)
-                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
 
                 // Fetch permissions descriptions from GitHub repo
                 var gitHubAppConfig = new GitHubRepoAppConfig
@@ -94,17 +87,23 @@ namespace PermissionsScraper.Triggers
 
                 log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
-
-                // Fetch permissions descriptions from repo.
-                var repoScopes = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
-
                 log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
 
                 log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}' " +
                     $"for new updates... Time: {DateTime.UtcNow}");
 
-                // Compare GitHub permissions descriptions to Service Principal permissions descriptions
+
+                var servicePrincipalScopes = JsonConvert.SerializeObject(_spScopesDescriptions, Formatting.Indented)
+                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
+
+                // Fetch permissions descriptions from repo.
+                var repoScopes = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
+                                                                                  permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+
+                _githubScopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
+                ConvertPermissionsDescriptionsToDictionary(permsAppConfig, repoScopes, ref _githubScopesDescriptions);
+
                 if (servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
                 {
                     log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
@@ -158,64 +157,73 @@ namespace PermissionsScraper.Triggers
         /// Retrieves and populates permissions descriptions from a Service Principal.
         /// </summary>
         /// <param name="config">The application configuration settings.</param>
-        /// <param name="result">The JSON response of the permissions and their descriptions retrieved from the Service Prinicpal.</param>
+        /// <param name="accessToken"> Access Token that can be used as a bearer token to access the Graph API.</param>
         /// <param name="version">The version of the API from which to fetch the scopes descriptions from the Service Principal.</param>
-        private static void PopulateScopesDescriptions(PermissionsAppConfig config,
-                                                       AuthenticationResult result,
-                                                       string version)
+        private static void PopulatePermissionsDescriptions(PermissionsAppConfig config,
+                                                            string accessToken,
+                                                            string version)
         {
+            if (string.IsNullOrEmpty(accessToken)) return;
+            if (string.IsNullOrEmpty(version)) return;
+
             string webApiUrl = $"{config.ApiUrl}{version}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'";
-            var spJson = ProtectedApiCallHelper
-                    .CallWebApiAsync(webApiUrl, result.AccessToken)
-                    .GetAwaiter().GetResult();
+            var servicePrincipalResponse = ProtectedApiCallHelper
+                                            .CallWebApiAsync(webApiUrl, accessToken)
+                                            .GetAwaiter().GetResult();
 
-            if (string.IsNullOrEmpty(spJson))
+            if (string.IsNullOrEmpty(servicePrincipalResponse))
             {
-                throw new ArgumentNullException(nameof(spJson), $"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
+                throw new Exception($"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
             }
 
-            var spJsonResponse = PermissionsFormatHelper.FormatServicePrincipalResponse(spJson, config);
+            servicePrincipalResponse = PermissionsFormatHelper.FormatServicePrincipalResponse(servicePrincipalResponse, config);
+            ConvertPermissionsDescriptionsToDictionary(config, servicePrincipalResponse, ref _spScopesDescriptions);
+        }
 
-            // Retrieve the top level scope dictionary
-            var spValue = JsonConvert.DeserializeObject<JObject>(spJsonResponse).Value<JArray>(config.TopLevelDictionaryName);
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="permissionsDescriptionsText"></param>
+        /// <param name="permissionsDictionary"></param>
+        private static void ConvertPermissionsDescriptionsToDictionary(PermissionsAppConfig config, string permissionsDescriptionsText, ref Dictionary<string, List<Dictionary<string, object>>> permissionsDictionary)
+        {
+            if (permissionsDictionary == null) return;
+            if (string.IsNullOrEmpty(permissionsDescriptionsText)) return;
 
-            if (spValue == null)
-            {
-                throw new ArgumentNullException(nameof(config.TopLevelDictionaryName), $"Attempt to retrieve the top-level dictionary returned empty data." +
-                    $"Name: {config.TopLevelDictionaryName}");
-            }
+            var permissionsDescriptionsToken = JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText).Value<JArray>(config.TopLevelDictionaryName)?.First ??
+                                               JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText);
+            ConvertPermissionsDescriptionsToDictionary(config, permissionsDescriptionsToken, ref permissionsDictionary);
+        }
 
-            /* Fetch permissions defined in the second level dictionary(ies),
-             * e.g. appRoles, oauth2PermissionScopes --> 2nd level dictionary keys
-             */
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="permissionsDescriptionsToken"></param>
+        /// <param name="permissionsDictionary"></param>
+        private static void ConvertPermissionsDescriptionsToDictionary(PermissionsAppConfig config, JToken permissionsDescriptionsToken, ref Dictionary<string, List<Dictionary<string, object>>> permissionsDictionary)
+        {
+            if (permissionsDictionary == null) return;
+            if (permissionsDescriptionsToken == null) return;
+
             foreach (string scopeName in config.ScopesNames)
             {
-                // Retrieve all scopes descriptions for a given 2nd level dictionary retrieved from the Service Principal
-                var scopeDescriptions = spValue.First.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
+                var permissionsDescriptions = permissionsDescriptionsToken?.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
+                if (permissionsDescriptions == null) continue;
 
-                if (scopeDescriptions == null)
+                if (!permissionsDictionary.ContainsKey(scopeName))
                 {
-                    continue;
+                    permissionsDictionary.Add(scopeName, new List<Dictionary<string, object>>());
                 }
 
-                // Add a key to the reference dictionary (if not present)
-                if (!_scopesDescriptions.ContainsKey(scopeName))
+                foreach (var permissionDescription in permissionsDescriptions)
                 {
-                    _scopesDescriptions.Add(scopeName, new List<Dictionary<string, object>>());
-                }
-
-                /* Add each of the scope description from SP to the current key in the
-                 * reference dictionary
-                 */
-                foreach (var scopeDesc in scopeDescriptions)
-                {
-                    /* Add only unique scopes (there might be duplicated scopes in both v1.0 and beta)
-                     * Uniqueness identified by id of the scope description
-                     */
-                    bool newScope = _uniqueScopes.Add(scopeDesc["id"].ToString());
-                    if (newScope)
+                    var id = permissionDescription["id"];
+                    var permissionExists = permissionsDictionary[scopeName].Exists(x => x.ContainsValue(id));
+                    if (!permissionExists)
                     {
-                        _scopesDescriptions[scopeName].Add(scopeDesc);
+                        permissionsDictionary[scopeName].Add(permissionDescription);
                     }
                 }
             }
