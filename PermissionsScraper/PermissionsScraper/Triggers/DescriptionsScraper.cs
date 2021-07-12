@@ -21,8 +21,8 @@ namespace PermissionsScraper.Triggers
 {
     public static class DescriptionsScraper
     {
-        private static Dictionary<string, List<Dictionary<string, object>>> _spScopesDescriptions; // will hold permissions descriptions from the Service Principal
-        private static Dictionary<string, List<Dictionary<string, object>>> _githubScopesDescriptions; // will hold permissions descriptions from GitHub
+        private static Dictionary<string, List<Dictionary<string, object>>> _servicePrincipalPermissions;
+        private static Dictionary<string, List<Dictionary<string, object>>> _githubPermissions;
 
         /// <summary>
         /// Timer function that fetches permissions descriptions from a Service Principal
@@ -38,8 +38,8 @@ namespace PermissionsScraper.Triggers
             try
             {
                 log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
-                PermissionsAppConfig permsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
-                var authResult = AuthService.GetAuthentication(permsAppConfig);
+                PermissionsAppConfig permissionsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
+                var authResult = AuthService.GetAuthentication(permissionsAppConfig);
 
                 if (authResult == null)
                 {
@@ -48,20 +48,20 @@ namespace PermissionsScraper.Triggers
                 }
                 log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
 
-                _spScopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
-                if (permsAppConfig.ApiVersions?.Length > 0)
+                _servicePrincipalPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
+                if (permissionsAppConfig.ApiVersions?.Length > 0)
                 {
-                    foreach (string apiVersion in permsAppConfig.ApiVersions)
+                    foreach (string apiVersion in permissionsAppConfig.ApiVersions)
                     {
                         log.LogInformation($"Fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
-                        PopulatePermissionsDescriptions(permsAppConfig, authResult.AccessToken, apiVersion);
+                        PopulatePermissionsDescriptions(permissionsAppConfig, authResult.AccessToken, apiVersion);
                         log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
                     }
                 }
 
-                if (!_spScopesDescriptions.Any())
+                if (!_servicePrincipalPermissions.Any())
                 {
-                    log.LogInformation($"{nameof(_spScopesDescriptions)} dictionary returned empty data. " +
+                    log.LogInformation($"{nameof(_servicePrincipalPermissions)} dictionary returned empty data. " +
                         $"Exiting function DescriptionsScraper Time: {DateTime.UtcNow}");
                     return;
                 }
@@ -69,64 +69,62 @@ namespace PermissionsScraper.Triggers
                 // Fetch permissions descriptions from GitHub repo
                 var gitHubAppConfig = new GitHubRepoAppConfig
                 {
-                    GitHubAppId = permsAppConfig.GitHubAppId,
-                    GitHubOrganization = permsAppConfig.GitHubOrganization,
-                    GitHubAppName = permsAppConfig.GitHubAppName,
-                    GitHubRepoName = permsAppConfig.GitHubRepoName,
-                    ReferenceBranch = permsAppConfig.ReferenceBranch,
-                    FileContentPath = permsAppConfig.FileContentPath,
-                    WorkingBranch = permsAppConfig.WorkingBranch,
-                    Reviewers = permsAppConfig.Reviewers,
-                    PullRequestTitle = permsAppConfig.PullRequestTitle,
-                    PullRequestBody = permsAppConfig.PullRequestBody,
-                    PullRequestLabels = permsAppConfig.PullRequestLabels,
-                    PullRequestAssignees = permsAppConfig.PullRequestAssignees,
-                    CommitMessage = permsAppConfig.CommitMessage,
+                    GitHubAppId = permissionsAppConfig.GitHubAppId,
+                    GitHubOrganization = permissionsAppConfig.GitHubOrganization,
+                    GitHubAppName = permissionsAppConfig.GitHubAppName,
+                    GitHubRepoName = permissionsAppConfig.GitHubRepoName,
+                    ReferenceBranch = permissionsAppConfig.ReferenceBranch,
+                    FileContentPath = permissionsAppConfig.FileContentPath,
+                    WorkingBranch = permissionsAppConfig.WorkingBranch,
+                    Reviewers = permissionsAppConfig.Reviewers,
+                    PullRequestTitle = permissionsAppConfig.PullRequestTitle,
+                    PullRequestBody = permissionsAppConfig.PullRequestBody,
+                    PullRequestLabels = permissionsAppConfig.PullRequestLabels,
+                    PullRequestAssignees = permissionsAppConfig.PullRequestAssignees,
+                    CommitMessage = permissionsAppConfig.CommitMessage,
                     TreeItemMode = Enums.TreeItemMode.Blob
                 };
 
-                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
+                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
-                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}'. " +
+                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
 
-                log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permsAppConfig.ReferenceBranch}' " +
+                log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}' " +
                     $"for new updates... Time: {DateTime.UtcNow}");
 
-
-                var servicePrincipalScopes = JsonConvert.SerializeObject(_spScopesDescriptions, Formatting.Indented)
-                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
-
                 // Fetch permissions descriptions from repo.
-                var repoScopes = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
-                                                                                  permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                var githubPermissionsText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
+                                                                                  permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
-                _githubScopesDescriptions = new Dictionary<string, List<Dictionary<string, object>>>();
-                ConvertPermissionsDescriptionsToDictionary(permsAppConfig, repoScopes, ref _githubScopesDescriptions);
+                _githubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
+                ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig, githubPermissionsText, ref _githubPermissions);
 
-                if (servicePrincipalScopes.Equals(repoScopes, StringComparison.OrdinalIgnoreCase))
+                bool permissionsUpdated = UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _githubPermissions);
+
+                if (permissionsUpdated is false)
                 {
                     log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
                     return;
                 }
 
-                // Save the new Service Principal scopes
-                gitHubAppConfig.FileContent = servicePrincipalScopes;
+                githubPermissionsText = JsonConvert.SerializeObject(_githubPermissions, Formatting.Indented)
+                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
+
+                gitHubAppConfig.FileContent = githubPermissionsText;
 
                 log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
-                // Write permissions descriptions to repo.
-                BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
-                // Create PR
                 log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
                     $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
 
-                PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
                     $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
@@ -177,34 +175,36 @@ namespace PermissionsScraper.Triggers
             }
 
             servicePrincipalResponse = PermissionsFormatHelper.FormatServicePrincipalResponse(servicePrincipalResponse, config);
-            ConvertPermissionsDescriptionsToDictionary(config, servicePrincipalResponse, ref _spScopesDescriptions);
+            ExtractPermissionsDescriptionsIntoDictionary(config, servicePrincipalResponse, ref _servicePrincipalPermissions);
         }
 
         /// <summary>
-        ///
+        /// Extracts permissions descriptions from a string input source
+        /// and adds them to a target permissions descriptions dictionary.
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="permissionsDescriptionsText"></param>
-        /// <param name="permissionsDictionary"></param>
-        private static void ConvertPermissionsDescriptionsToDictionary(PermissionsAppConfig config, string permissionsDescriptionsText, ref Dictionary<string, List<Dictionary<string, object>>> permissionsDictionary)
+        /// <param name="config">The application configuration settings.</param>
+        /// <param name="permissionsDescriptionsText">The string input with permissions descriptions.</param>
+        /// <param name="referencePermissionsDictionary">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
+        private static void ExtractPermissionsDescriptionsIntoDictionary(PermissionsAppConfig config, string permissionsDescriptionsText, ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDictionary)
         {
-            if (permissionsDictionary == null) return;
+            if (referencePermissionsDictionary == null) return;
             if (string.IsNullOrEmpty(permissionsDescriptionsText)) return;
 
             var permissionsDescriptionsToken = JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText).Value<JArray>(config.TopLevelDictionaryName)?.First ??
                                                JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText);
-            ConvertPermissionsDescriptionsToDictionary(config, permissionsDescriptionsToken, ref permissionsDictionary);
+            ExtractPermissionsDescriptionsIntoDictionary(config, permissionsDescriptionsToken, ref referencePermissionsDictionary);
         }
 
         /// <summary>
-        ///
+        /// Extracts permissions descriptions from a <see cref="JToken"/> source
+        /// and adds them to a target permissions descriptions dictionary.
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="permissionsDescriptionsToken"></param>
-        /// <param name="permissionsDictionary"></param>
-        private static void ConvertPermissionsDescriptionsToDictionary(PermissionsAppConfig config, JToken permissionsDescriptionsToken, ref Dictionary<string, List<Dictionary<string, object>>> permissionsDictionary)
+        /// <param name="config">The application configuration settings.</param>
+        /// <param name="permissionsDescriptionsToken">The <see cref="JToken"/> input with permissions descriptions.</param>
+        /// <param name="referencePermissionsDescriptions">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
+        private static void ExtractPermissionsDescriptionsIntoDictionary(PermissionsAppConfig config, JToken permissionsDescriptionsToken, ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDescriptions)
         {
-            if (permissionsDictionary == null) return;
+            if (referencePermissionsDescriptions == null) return;
             if (permissionsDescriptionsToken == null) return;
 
             foreach (string scopeName in config.ScopesNames)
@@ -212,21 +212,101 @@ namespace PermissionsScraper.Triggers
                 var permissionsDescriptions = permissionsDescriptionsToken?.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
                 if (permissionsDescriptions == null) continue;
 
-                if (!permissionsDictionary.ContainsKey(scopeName))
+                if (referencePermissionsDescriptions.ContainsKey(scopeName) is false)
                 {
-                    permissionsDictionary.Add(scopeName, new List<Dictionary<string, object>>());
+                    referencePermissionsDescriptions.Add(scopeName, new List<Dictionary<string, object>>());
                 }
 
                 foreach (var permissionDescription in permissionsDescriptions)
                 {
                     var id = permissionDescription["id"];
-                    var permissionExists = permissionsDictionary[scopeName].Exists(x => x.ContainsValue(id));
-                    if (!permissionExists)
+                    var permissionExists = referencePermissionsDescriptions[scopeName].Exists(x => x.ContainsValue(id));
+                    if (permissionExists is false)
                     {
-                        permissionsDictionary[scopeName].Add(permissionDescription);
+                        referencePermissionsDescriptions[scopeName].Add(permissionDescription);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Updates the permissions descriptions in the target source from the reference source if there is variance
+        /// between the two sets of permissions descriptions sources.
+        /// </summary>
+        /// <param name="referencePermissions">The reference permissions descriptions source to compare from.</param>
+        /// <param name="updatablePermissions">The target permissions descriptions source to compare against.</param>
+        /// <returns>True, if permissions have been updated in the target source, otherwise false.</returns>
+        private static bool UpdatePermissionsDescriptions(Dictionary<string, List<Dictionary<string, object>>> referencePermissions,
+                                                                ref Dictionary<string, List<Dictionary<string, object>>> updatablePermissions)
+        {
+            if (referencePermissions is null)
+            {
+                throw new ArgumentNullException(nameof(referencePermissions));
+            }
+
+            if (updatablePermissions is null)
+            {
+                throw new ArgumentNullException(nameof(updatablePermissions));
+            }
+
+            bool permissionsUpdated = false;
+
+            /* Search for permissions from the reference permissions dictionary
+             * the are either missing or different (with same id)
+             * from the updatable permissions dictionary.
+             */
+            foreach (var refPermissionKey in referencePermissions.Keys)
+            {
+                foreach (var referencePermission in referencePermissions[refPermissionKey])
+                {
+                    var id = referencePermission["id"];
+                    var updatablePermission = updatablePermissions[refPermissionKey].FirstOrDefault(x => x["id"].Equals(id));
+                    if (updatablePermission is null)
+                    {
+                        // New permission in reference - add
+                        updatablePermissions[refPermissionKey].Insert(0, referencePermission);
+                        permissionsUpdated = true;
+                    }
+                    else
+                    {
+                        // Permissions match by id - check whether contents need updating
+                        var referencePermissionsText = JsonConvert.SerializeObject(referencePermission, Formatting.Indented);
+                        var updatablePermissionText = JsonConvert.SerializeObject(updatablePermission, Formatting.Indented);
+
+                        if (referencePermissionsText.Equals(updatablePermissionText, StringComparison.OrdinalIgnoreCase) is not true)
+                        {
+                            // Permission updated in reference - remove then add
+                            var index = updatablePermissions[refPermissionKey].FindIndex(x => x["id"].Equals(id));
+                            updatablePermissions[refPermissionKey].RemoveAt(index);
+                            updatablePermissions[refPermissionKey].Insert(index, referencePermission);
+                            permissionsUpdated = true;
+                        }
+                    }
+                }
+
+                /* Search for permissions from the updatable permissions dictionary
+                 * that are missing from the reference permissions dictionary.
+                 * These need to be removed from the updatable permissions dictionary.
+                 */
+                var missingRefPermissions = new List<Dictionary<string, object>>();
+                foreach (var updatablePermission in updatablePermissions[refPermissionKey])
+                {
+                    var id = updatablePermission["id"];
+                    var referencePermission = referencePermissions[refPermissionKey].FirstOrDefault(x => x["id"].Equals(id));
+                    if (referencePermission is null)
+                    {
+                        missingRefPermissions.Add(updatablePermission);
+                    }
+                }
+
+                foreach (var missingRefPermission in missingRefPermissions)
+                {
+                    updatablePermissions[refPermissionKey].Remove(missingRefPermission);
+                    permissionsUpdated = true;
+                }
+            }
+
+            return permissionsUpdated;
         }
     }
 }
