@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PermissionsScraper.Common;
 
@@ -11,28 +12,32 @@ namespace PermissionsScraper.Helpers
     internal static class PermissionsFormatHelper
     {
         /// <summary>
-        /// Applies regex patterns to clean up the Service Principal JSON response data
+        /// Replaces matched regex patterns with replacement strings for a given string value.
         /// </summary>
-        /// <param name="spJsonResponse">The Service Principal JSON response data.</param>
-        /// <param name="config">The application configuration settings.</param>
+        /// <param name="value">The Service Principal JSON response data.</param>
+        /// <param name="regexMatchPatterns">The regex patterns to match against.</param>
+        /// <param name="regexReplacements">The values to replace the regex matches with.</param>
         /// <returns>The Service Principal JSON response data with the regex transformations applied.</returns>
-        internal static string FormatServicePrincipalResponse(string spJsonResponse, ApplicationConfig config)
+        internal static string ReplaceRegexPatterns(string value,
+                                                    Dictionary<string, string> regexMatchPatterns,
+                                                    Dictionary<string, string> regexReplacements)
         {
-            if (string.IsNullOrEmpty(spJsonResponse))
+            UtilityFunctions.CheckArgumentNullOrEmpty(value, nameof(value));
+            UtilityFunctions.CheckArgumentNull(regexMatchPatterns, nameof(regexMatchPatterns));
+            UtilityFunctions.CheckArgumentNull(regexReplacements, nameof(regexReplacements));
+
+            string cleanValue = value;
+
+            foreach (var item in regexMatchPatterns)
             {
-                throw new ArgumentNullException(nameof(spJsonResponse), "Parameter cannot be null or empty");
+                Regex regex = new(item.Value, RegexOptions.IgnoreCase);
+                if (regexReplacements.TryGetValue(item.Key, out var replacement))
+                {
+                    cleanValue = regex.Replace(cleanValue, replacement);
+                }
             }
 
-            string cleanedSpJson = spJsonResponse;
-
-            foreach (var item in config.RegexPatterns)
-            {
-                Regex regex = new Regex(item.Value, RegexOptions.IgnoreCase);
-                var replacement = config.RegexReplacements[item.Key];
-                cleanedSpJson = regex.Replace(cleanedSpJson, replacement);
-            }
-
-            return cleanedSpJson;
+            return cleanValue;
         }
 
         /// <summary>
