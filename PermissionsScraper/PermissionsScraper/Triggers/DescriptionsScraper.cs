@@ -31,7 +31,7 @@ namespace PermissionsScraper.Triggers
         /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
         /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("0 0 9 * * 1-5")] TimerInfo myTimer, ILogger log)
+        public static void Run([TimerTrigger("%ScheduleTriggerTime%")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
 
@@ -98,9 +98,9 @@ namespace PermissionsScraper.Triggers
                                                                                   permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 _githubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
-                ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig, githubPermissionsText, ref _githubPermissions);
+                PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames, githubPermissionsText, ref _githubPermissions);
 
-                bool permissionsUpdated = UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _githubPermissions);
+                bool permissionsUpdated = PermissionsProcessor.UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _githubPermissions);
 
                 if (permissionsUpdated is false)
                 {
@@ -174,139 +174,8 @@ namespace PermissionsScraper.Triggers
                 throw new Exception($"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
             }
 
-            servicePrincipalResponse = PermissionsFormatHelper.FormatServicePrincipalResponse(servicePrincipalResponse, config);
-            ExtractPermissionsDescriptionsIntoDictionary(config, servicePrincipalResponse, ref _servicePrincipalPermissions);
-        }
-
-        /// <summary>
-        /// Extracts permissions descriptions from a string input source
-        /// and adds them to a target permissions descriptions dictionary.
-        /// </summary>
-        /// <param name="config">The application configuration settings.</param>
-        /// <param name="permissionsDescriptionsText">The string input with permissions descriptions.</param>
-        /// <param name="referencePermissionsDictionary">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
-        private static void ExtractPermissionsDescriptionsIntoDictionary(PermissionsAppConfig config, string permissionsDescriptionsText, ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDictionary)
-        {
-            if (referencePermissionsDictionary == null) return;
-            if (string.IsNullOrEmpty(permissionsDescriptionsText)) return;
-
-            var permissionsDescriptionsToken = JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText).Value<JArray>(config.TopLevelDictionaryName)?.First ??
-                                               JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText);
-            ExtractPermissionsDescriptionsIntoDictionary(config, permissionsDescriptionsToken, ref referencePermissionsDictionary);
-        }
-
-        /// <summary>
-        /// Extracts permissions descriptions from a <see cref="JToken"/> source
-        /// and adds them to a target permissions descriptions dictionary.
-        /// </summary>
-        /// <param name="config">The application configuration settings.</param>
-        /// <param name="permissionsDescriptionsToken">The <see cref="JToken"/> input with permissions descriptions.</param>
-        /// <param name="referencePermissionsDescriptions">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
-        private static void ExtractPermissionsDescriptionsIntoDictionary(PermissionsAppConfig config, JToken permissionsDescriptionsToken, ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDescriptions)
-        {
-            if (referencePermissionsDescriptions == null) return;
-            if (permissionsDescriptionsToken == null) return;
-
-            foreach (string scopeName in config.ScopesNames)
-            {
-                var permissionsDescriptions = permissionsDescriptionsToken?.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
-                if (permissionsDescriptions == null) continue;
-
-                if (referencePermissionsDescriptions.ContainsKey(scopeName) is false)
-                {
-                    referencePermissionsDescriptions.Add(scopeName, new List<Dictionary<string, object>>());
-                }
-
-                foreach (var permissionDescription in permissionsDescriptions)
-                {
-                    var id = permissionDescription["id"];
-                    var permissionExists = referencePermissionsDescriptions[scopeName].Exists(x => x.ContainsValue(id));
-                    if (permissionExists is false)
-                    {
-                        referencePermissionsDescriptions[scopeName].Add(permissionDescription);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates the permissions descriptions in the target source from the reference source if there is variance
-        /// between the two sets of permissions descriptions sources.
-        /// </summary>
-        /// <param name="referencePermissions">The reference permissions descriptions source to compare from.</param>
-        /// <param name="updatablePermissions">The target permissions descriptions source to compare against.</param>
-        /// <returns>True, if permissions have been updated in the target source, otherwise false.</returns>
-        private static bool UpdatePermissionsDescriptions(Dictionary<string, List<Dictionary<string, object>>> referencePermissions,
-                                                                ref Dictionary<string, List<Dictionary<string, object>>> updatablePermissions)
-        {
-            if (referencePermissions is null)
-            {
-                throw new ArgumentNullException(nameof(referencePermissions));
-            }
-
-            if (updatablePermissions is null)
-            {
-                throw new ArgumentNullException(nameof(updatablePermissions));
-            }
-
-            bool permissionsUpdated = false;
-
-            /* Search for permissions from the reference permissions dictionary
-             * the are either missing or different (with same id)
-             * from the updatable permissions dictionary.
-             */
-            foreach (var refPermissionKey in referencePermissions.Keys)
-            {
-                foreach (var referencePermission in referencePermissions[refPermissionKey])
-                {
-                    var id = referencePermission["id"];
-                    var updatablePermission = updatablePermissions[refPermissionKey].FirstOrDefault(x => x["id"].Equals(id));
-                    if (updatablePermission is null)
-                    {
-                        // New permission in reference - add
-                        updatablePermissions[refPermissionKey].Insert(0, referencePermission);
-                        permissionsUpdated = true;
-                    }
-                    else
-                    {
-                        // Permissions match by id - check whether contents need updating
-                        var referencePermissionsText = JsonConvert.SerializeObject(referencePermission, Formatting.Indented);
-                        var updatablePermissionText = JsonConvert.SerializeObject(updatablePermission, Formatting.Indented);
-
-                        if (referencePermissionsText.Equals(updatablePermissionText, StringComparison.OrdinalIgnoreCase) is not true)
-                        {
-                            // Permission updated in reference - remove then add
-                            var index = updatablePermissions[refPermissionKey].FindIndex(x => x["id"].Equals(id));
-                            updatablePermissions[refPermissionKey].RemoveAt(index);
-                            updatablePermissions[refPermissionKey].Insert(index, referencePermission);
-                            permissionsUpdated = true;
-                        }
-                    }
-                }
-
-                /* Search for permissions from the updatable permissions dictionary
-                 * that are missing from the reference permissions dictionary.
-                 * These need to be removed from the updatable permissions dictionary.
-                 */
-                var missingRefPermissions = new List<Dictionary<string, object>>();
-                foreach (var updatablePermission in updatablePermissions[refPermissionKey])
-                {
-                    var id = updatablePermission["id"];
-                    var referencePermission = referencePermissions[refPermissionKey].FirstOrDefault(x => x["id"].Equals(id));
-                    if (referencePermission is null)
-                    {
-                        missingRefPermissions.Add(updatablePermission);
-                    }
-                }
-
-                foreach (var missingRefPermission in missingRefPermissions)
-                {
-                    updatablePermissions[refPermissionKey].Remove(missingRefPermission);
-                    permissionsUpdated = true;
-                }
-            }
-
-            return permissionsUpdated;
+            servicePrincipalResponse = PermissionsFormatHelper.ReplaceRegexPatterns(servicePrincipalResponse, config.RegexPatterns, config.RegexReplacements);
+            PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(config.ScopesNames, servicePrincipalResponse, ref _servicePrincipalPermissions, config.TopLevelDictionaryName);
         }
     }
 }
