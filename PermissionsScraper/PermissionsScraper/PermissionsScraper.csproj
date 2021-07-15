@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
@@ -10,6 +10,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Submodules\msgraph-github-content-utility\GitHubContentUtility\GitHubContentUtility.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
