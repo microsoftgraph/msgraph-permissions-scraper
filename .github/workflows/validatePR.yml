@@ -1,4 +1,4 @@
-name: .NET
+name: Validate PR
 
 on:  
   pull_request:
@@ -7,17 +7,16 @@ on:
       - master
       
 jobs:
-  build:
-
+  build and test:
     runs-on: windows-latest
-
+    
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
-    - name: Checkout repository and submodules
+    - name: Checkout submodules
       uses: actions/checkout@v2
       with:
         submodules: recursive
@@ -25,5 +24,5 @@ jobs:
       run: dotnet restore PermissionsScraper
     - name: Build
       run: dotnet build PermissionsScraper
-    - name: Test
+    - name: Run tests
       run: dotnet test PermissionsScraper
