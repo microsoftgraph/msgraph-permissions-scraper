@@ -89,7 +89,7 @@ namespace PermissionsScraper.Services
             bool permissionsUpdated = false;
 
             /* Search for permissions from the reference permissions dictionary
-             * the are either missing or different (with same id)
+             * that are either missing or different (with same id)
              * from the updatable permissions dictionary.
              */
             foreach (var refPermissionKey in referencePermissions.Keys)

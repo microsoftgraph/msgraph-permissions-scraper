@@ -28,7 +28,7 @@ namespace PermissionsScraper.Triggers
         /// Timer function that fetches permissions descriptions from a Service Principal
         /// and uploads them to a GitHub repo at specified times.
         /// </summary>
-        /// <param name="myTimer">Trigger function every weekday at 9 AM UTC</param>
+        /// <param name="myTimer">Trigger function execution according to the specified cron time.</param>
         /// <param name="log">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
         public static void Run([TimerTrigger("%ScheduleTriggerTime%")] TimerInfo myTimer, ILogger log)
