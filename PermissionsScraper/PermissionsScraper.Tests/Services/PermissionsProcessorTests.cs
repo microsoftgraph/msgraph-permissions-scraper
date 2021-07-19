@@ -91,8 +91,8 @@ namespace PermissionsScraper.Services.Tests
             return PermissionsFormatHelper.ReplaceRegexPatterns(servicePrincipalDescriptions, regexMatchPatterns, regexReplacements);
         }
 
-        private static (Dictionary<string, List<Dictionary<string, object>>> ServicePrincipalPermissionsDict,
-                        Dictionary<string, List<Dictionary<string, object>>> GitHubPermissionsDict)
+        private static (Dictionary<string, List<Dictionary<string, object>>> servicePrincipalPermissionsDict,
+                        Dictionary<string, List<Dictionary<string, object>>> gitHubPermissionsDict)
                         GetPermissionsDescriptionsDictionaries()
         {
             var servicePrincipalPermissionsText = GetServicePrincipalPermissionsDescriptionsText().GetAwaiter().GetResult();

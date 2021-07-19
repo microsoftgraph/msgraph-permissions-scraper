@@ -9,20 +9,20 @@ using GitHubContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
 using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using System.Linq;
 using Octokit;
+using PermissionsScraper.Common;
 
 namespace PermissionsScraper.Triggers
 {
     public static class DescriptionsScraper
     {
         private static Dictionary<string, List<Dictionary<string, object>>> _servicePrincipalPermissions;
-        private static Dictionary<string, List<Dictionary<string, object>>> _githubPermissions;
+        private static Dictionary<string, List<Dictionary<string, object>>> _updatedGithubPermissions;
 
         /// <summary>
         /// Timer function that fetches permissions descriptions from a Service Principal
@@ -38,6 +38,7 @@ namespace PermissionsScraper.Triggers
             try
             {
                 log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
+
                 PermissionsAppConfig permissionsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
                 var authResult = AuthService.GetAuthentication(permissionsAppConfig);
 
@@ -46,6 +47,7 @@ namespace PermissionsScraper.Triggers
                     log.LogInformation($"Failed to get authentication into the Web API. Time: {DateTime.UtcNow}");
                     return;
                 }
+
                 log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
 
                 _servicePrincipalPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
@@ -54,7 +56,13 @@ namespace PermissionsScraper.Triggers
                     foreach (string apiVersion in permissionsAppConfig.ApiVersions)
                     {
                         log.LogInformation($"Fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
-                        PopulatePermissionsDescriptions(permissionsAppConfig, authResult.AccessToken, apiVersion);
+
+                        var spPermissionsDescriptions = FetchServicePrincipalPermissionsDescriptions(permissionsAppConfig, authResult.AccessToken, apiVersion);
+                        PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
+                                                                                          spPermissionsDescriptions,
+                                                                                          ref _servicePrincipalPermissions,
+                                                                                          permissionsAppConfig.TopLevelDictionaryName);
+
                         log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
                     }
                 }
@@ -62,11 +70,10 @@ namespace PermissionsScraper.Triggers
                 if (!_servicePrincipalPermissions.Any())
                 {
                     log.LogInformation($"{nameof(_servicePrincipalPermissions)} dictionary returned empty data. " +
-                        $"Exiting function DescriptionsScraper Time: {DateTime.UtcNow}");
+                        $"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
                     return;
                 }
 
-                // Fetch permissions descriptions from GitHub repo
                 var gitHubAppConfig = new GitHubRepoAppConfig
                 {
                     GitHubAppId = permissionsAppConfig.GitHubAppId,
@@ -87,31 +94,28 @@ namespace PermissionsScraper.Triggers
 
                 log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
+
+                var githubPermissionsText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
+                    permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                _updatedGithubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
+                PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
+                                                                                  githubPermissionsText,
+                                                                                  ref _updatedGithubPermissions);
+
                 log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
 
                 log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}' " +
                     $"for new updates... Time: {DateTime.UtcNow}");
 
-                // Fetch permissions descriptions from repo.
-                var githubPermissionsText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
-                                                                                  permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
-
-                _githubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
-                PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames, githubPermissionsText, ref _githubPermissions);
-
-                bool permissionsUpdated = PermissionsProcessor.UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _githubPermissions);
-
+                bool permissionsUpdated = PermissionsProcessor.UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _updatedGithubPermissions);
                 if (permissionsUpdated is false)
                 {
                     log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
                     return;
                 }
 
-                githubPermissionsText = JsonConvert.SerializeObject(_githubPermissions, Formatting.Indented)
-                    .Replace("\r", string.Empty); // Hack to avoid whitespace diff with GitHub source document (formatted with only \n)
-
-                gitHubAppConfig.FileContent = githubPermissionsText;
+                gitHubAppConfig.FileContent = JsonConvert.SerializeObject(_updatedGithubPermissions, Formatting.Indented).ChangeLineBreaks();
 
                 log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
@@ -152,30 +156,28 @@ namespace PermissionsScraper.Triggers
         }
 
         /// <summary>
-        /// Retrieves and populates permissions descriptions from a Service Principal.
+        /// Retrieves permissions descriptions from a Service Principal.
         /// </summary>
         /// <param name="config">The application configuration settings.</param>
         /// <param name="accessToken"> Access Token that can be used as a bearer token to access the Graph API.</param>
         /// <param name="version">The version of the API from which to fetch the scopes descriptions from the Service Principal.</param>
-        private static void PopulatePermissionsDescriptions(PermissionsAppConfig config,
-                                                            string accessToken,
-                                                            string version)
+        private static string FetchServicePrincipalPermissionsDescriptions(PermissionsAppConfig config,
+                                                                           string accessToken,
+                                                                           string version)
         {
-            if (string.IsNullOrEmpty(accessToken)) return;
-            if (string.IsNullOrEmpty(version)) return;
+            UtilityFunctions.CheckArgumentNull(config, nameof(config));
+            UtilityFunctions.CheckArgumentNullOrEmpty(accessToken, nameof(accessToken));
+            UtilityFunctions.CheckArgumentNullOrEmpty(version, nameof(version));
 
-            string webApiUrl = $"{config.ApiUrl}{version}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'";
+            var webApiUrl = $"{config.ApiUrl}{version}/serviceprincipals?$filter=appId eq '{config.ServicePrincipalId}'";
             var servicePrincipalResponse = ProtectedApiCallHelper
                                             .CallWebApiAsync(webApiUrl, accessToken)
                                             .GetAwaiter().GetResult();
 
-            if (string.IsNullOrEmpty(servicePrincipalResponse))
-            {
-                throw new Exception($"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ");
-            }
-
-            servicePrincipalResponse = PermissionsFormatHelper.ReplaceRegexPatterns(servicePrincipalResponse, config.RegexPatterns, config.RegexReplacements);
-            PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(config.ScopesNames, servicePrincipalResponse, ref _servicePrincipalPermissions, config.TopLevelDictionaryName);
+            // Need to replace certain key words in the raw response with our business domain key words
+            return string.IsNullOrEmpty(servicePrincipalResponse)
+                ? throw new Exception($"The call to fetch the Service Principal returned empty data. URL: {webApiUrl} ")
+                : PermissionsFormatHelper.ReplaceRegexPatterns(servicePrincipalResponse, config.RegexPatterns, config.RegexReplacements);
         }
     }
 }

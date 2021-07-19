@@ -2,6 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
+using PermissionsScraper.Common;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -23,16 +24,10 @@ namespace PermissionsScraper.Helpers
         /// <returns>The response of the call to the Web API</returns>
         internal static async Task<string> CallWebApiAsync(string webApiUrl, string accessToken)
         {
-            if (string.IsNullOrEmpty(webApiUrl))
-            {
-                throw new ArgumentNullException(nameof(webApiUrl), "Parameter cannot be null or empty");
-            }
-            if (string.IsNullOrEmpty(accessToken))
-            {
-                throw new ArgumentNullException(nameof(accessToken), "Parameter cannot be null or empty");
-            }
+            UtilityFunctions.CheckArgumentNullOrEmpty(webApiUrl, nameof(webApiUrl));
+            UtilityFunctions.CheckArgumentNullOrEmpty(accessToken, nameof(accessToken));
 
-            HttpClient httpClient = new HttpClient();
+            HttpClient httpClient = new();
             HttpRequestHeaders defaultRequestHeaders = httpClient.DefaultRequestHeaders;
             if (!defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
             {
@@ -41,15 +36,9 @@ namespace PermissionsScraper.Helpers
             defaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
 
             HttpResponseMessage response = await httpClient.GetAsync(webApiUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                string json = await response.Content.ReadAsStringAsync();
-                return json;
-            }
-            else
-            {
-                throw new Exception(await response.Content.ReadAsStringAsync());
-            }
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadAsStringAsync()
+                : throw new Exception(await response.Content.ReadAsStringAsync());
         }
     }
 }

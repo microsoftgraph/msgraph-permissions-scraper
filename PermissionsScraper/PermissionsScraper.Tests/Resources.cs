@@ -2,9 +2,9 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-using PermissionsScraper.Common;
 using System.IO;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace PermissionsScraper.Tests
 {
@@ -17,7 +17,7 @@ namespace PermissionsScraper.Tests
         /// <returns>The contents of the file.</returns>
         public static async Task<string> GetFileContents(string filePathSource)
         {
-            UtilityFunctions.CheckArgumentNullOrEmpty(filePathSource, nameof(filePathSource));
+            Assert.NotNull(filePathSource);
 
             try
             {

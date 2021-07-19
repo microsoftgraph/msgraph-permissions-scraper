@@ -8,7 +8,6 @@ using PermissionsScraper.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace PermissionsScraper.Services
 {
@@ -18,7 +17,7 @@ namespace PermissionsScraper.Services
         /// Extracts permissions descriptions from a string input source
         /// and adds them to a target permissions descriptions dictionary.
         /// </summary>
-        /// <param name="config">The application configuration settings.</param>
+        /// <param name="scopesNames">The scope names to retrieve from the permissions descriptions.</param>
         /// <param name="permissionsDescriptionsText">The string input with permissions descriptions.</param>
         /// <param name="referencePermissionsDictionary">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
         public static void ExtractPermissionsDescriptionsIntoDictionary(string[] scopesNames,
@@ -41,12 +40,12 @@ namespace PermissionsScraper.Services
         /// Extracts permissions descriptions from a <see cref="JToken"/> source
         /// and adds them to a target permissions descriptions dictionary.
         /// </summary>
-        /// <param name="config">The application configuration settings.</param>
+        /// <param name="scopesNames">The scope names to retrieve from the permissions descriptions.</param>
         /// <param name="permissionsDescriptionsToken">The <see cref="JToken"/> input with permissions descriptions.</param>
         /// <param name="referencePermissionsDescriptions">The target permissions descriptions dictionary which the extracted permissions will be added into.</param>
         private static void ExtractPermissionsDescriptionsIntoDictionary(string[] scopesNames,
-                                                                        JToken permissionsDescriptionsToken,
-                                                                        ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDescriptions)
+                                                                         JToken permissionsDescriptionsToken,
+                                                                         ref Dictionary<string, List<Dictionary<string, object>>> referencePermissionsDescriptions)
         {
             UtilityFunctions.CheckArgumentNull(scopesNames, nameof(scopesNames));
             UtilityFunctions.CheckArgumentNull(permissionsDescriptionsToken, nameof(permissionsDescriptionsToken));
