@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: net5.0
+        dotnet-version: '5.0.x'
     - name: Checkout submodules
       uses: actions/checkout@v2
       with:
