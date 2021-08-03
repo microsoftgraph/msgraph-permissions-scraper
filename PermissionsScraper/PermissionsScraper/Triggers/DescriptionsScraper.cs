@@ -15,6 +15,7 @@ using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using Octokit;
 using PermissionsScraper.Common;
+using System.Linq;
 
 namespace PermissionsScraper.Triggers
 {
@@ -66,7 +67,7 @@ namespace PermissionsScraper.Triggers
                     }
                 }
 
-                if (_servicePrincipalPermissions.Count == 0)
+                if (!_servicePrincipalPermissions.Any())
                 {
                     log.LogInformation($"{nameof(_servicePrincipalPermissions)} dictionary returned empty data. " +
                         $"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
