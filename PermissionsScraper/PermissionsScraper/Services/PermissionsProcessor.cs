@@ -110,7 +110,7 @@ namespace PermissionsScraper.Services
                         var referencePermissionsText = JsonConvert.SerializeObject(referencePermission, Formatting.Indented);
                         var updatablePermissionText = JsonConvert.SerializeObject(updatablePermission, Formatting.Indented);
 
-                        if (referencePermissionsText.Equals(updatablePermissionText, StringComparison.OrdinalIgnoreCase) is not true)
+                        if (!referencePermissionsText.Equals(updatablePermissionText, StringComparison.OrdinalIgnoreCase))
                         {
                             // Permission updated in reference - remove then add
                             var index = updatablePermissions[refPermissionKey].FindIndex(x => x["id"].Equals(id));

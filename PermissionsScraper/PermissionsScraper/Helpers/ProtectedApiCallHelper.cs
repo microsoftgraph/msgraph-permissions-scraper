@@ -27,15 +27,15 @@ namespace PermissionsScraper.Helpers
             UtilityFunctions.CheckArgumentNullOrEmpty(webApiUrl, nameof(webApiUrl));
             UtilityFunctions.CheckArgumentNullOrEmpty(accessToken, nameof(accessToken));
 
-            HttpClient httpClient = new();
-            HttpRequestHeaders defaultRequestHeaders = httpClient.DefaultRequestHeaders;
+            var httpClient = new HttpClient();
+            var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
             if (!defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
             {
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
             defaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
 
-            HttpResponseMessage response = await httpClient.GetAsync(webApiUrl);
+            var response = await httpClient.GetAsync(webApiUrl);
             return response.IsSuccessStatusCode
                 ? await response.Content.ReadAsStringAsync()
                 : throw new Exception(await response.Content.ReadAsStringAsync());

@@ -30,7 +30,7 @@ namespace PermissionsScraper.Helpers
 
             foreach (var item in regexMatchPatterns)
             {
-                Regex regex = new(item.Value, RegexOptions.IgnoreCase);
+                Regex regex = new Regex(item.Value, RegexOptions.IgnoreCase);
                 if (regexReplacements.TryGetValue(item.Key, out var replacement))
                 {
                     cleanValue = regex.Replace(cleanValue, replacement);
