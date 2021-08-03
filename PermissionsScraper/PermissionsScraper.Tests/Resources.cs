@@ -21,7 +21,7 @@ namespace PermissionsScraper.Tests
 
             try
             {
-                using StreamReader streamReader = new(filePathSource);
+                using var streamReader = new StreamReader(filePathSource);
                 return await streamReader.ReadToEndAsync();
             }
             catch
