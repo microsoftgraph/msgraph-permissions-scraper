@@ -65,7 +65,7 @@ namespace PermissionsScraper.Services
                 {
                     var id = permissionDescription["id"];
                     var permissionExists = referencePermissionsDescriptions[scopeName].Exists(x => x.ContainsValue(id));
-                    if (permissionExists is false)
+                    if (!permissionExists)
                     {
                         referencePermissionsDescriptions[scopeName].Add(permissionDescription);
                     }
