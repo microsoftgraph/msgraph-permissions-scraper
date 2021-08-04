@@ -56,7 +56,7 @@ namespace PermissionsScraper.Services
                 var permissionsDescriptions = permissionsDescriptionsToken?.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
                 if (permissionsDescriptions == null) continue;
 
-                if (referencePermissionsDescriptions.ContainsKey(scopeName) is false)
+                if (!referencePermissionsDescriptions.ContainsKey(scopeName))
                 {
                     referencePermissionsDescriptions.Add(scopeName, new List<Dictionary<string, object>>());
                 }
