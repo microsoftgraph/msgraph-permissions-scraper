@@ -51,7 +51,7 @@ namespace PermissionsScraper.Services
             UtilityFunctions.CheckArgumentNull(permissionsDescriptionsToken, nameof(permissionsDescriptionsToken));
             UtilityFunctions.CheckArgumentNull(referencePermissionsDescriptions, nameof(referencePermissionsDescriptions));
 
-            foreach (string scopeName in scopesNames)
+            foreach (var scopeName in scopesNames)
             {
                 var permissionsDescriptions = permissionsDescriptionsToken?.Value<JArray>(scopeName)?.ToObject<List<Dictionary<string, object>>>();
                 if (permissionsDescriptions == null) continue;
@@ -136,11 +136,10 @@ namespace PermissionsScraper.Services
                     }
                 }
 
-                foreach (var missingRefPermission in missingRefPermissions)
-                {
-                    updatablePermissions[refPermissionKey].Remove(missingRefPermission);
-                    permissionsUpdated = true;
-                }
+                updatablePermissions[refPermissionKey].RemoveAll(PermissionDeleted);
+
+                bool PermissionDeleted(Dictionary<string, object> permission)
+                    => missingRefPermissions.Exists(x => x.ContainsValue(permission["id"]));
             }
 
             return permissionsUpdated;
