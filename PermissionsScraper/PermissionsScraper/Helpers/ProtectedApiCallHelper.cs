@@ -29,7 +29,7 @@ namespace PermissionsScraper.Helpers
 
             var httpClient = new HttpClient();
             var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
-            if (!defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
+            if (!defaultRequestHeaders.Accept.Any(m => "application/json".Equals(m.MediaType, StringComparison.OrdinalIgnoreCase)))
             {
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
