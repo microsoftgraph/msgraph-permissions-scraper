@@ -16,10 +16,10 @@ namespace PermissionsScraper.Services.Tests
         private const string ApplicationScopes = "applicationScopesList";
 
         [Fact]
-        public void ExtractPermissionsDescriptionsIntoDictionaryWorks()
+        public async Task ExtractPermissionsDescriptionsIntoDictionaryWorks()
         {
             // Arrange & Act
-            (var servicePrincipalPermissionsDict, var gitHubPermissionsDict) = GetPermissionsDescriptionsDictionaries();
+            (var servicePrincipalPermissionsDict, var gitHubPermissionsDict) = await GetPermissionsDescriptionsDictionariesAsync();
 
             // Assert
             Assert.Equal(292, servicePrincipalPermissionsDict[DelegatedScopes].Count);
@@ -29,10 +29,10 @@ namespace PermissionsScraper.Services.Tests
         }
 
         [Fact]
-        public void UpdatePermissionsDescriptionsWorks()
+        public async Task UpdatePermissionsDescriptionsWorks()
         {
             // Arrange
-            (var servicePrincipalPermissionsDict, var gitHubPermissionsDict) = GetPermissionsDescriptionsDictionaries();
+            (var servicePrincipalPermissionsDict, var gitHubPermissionsDict) = await GetPermissionsDescriptionsDictionariesAsync();
 
             // Act
             PermissionsProcessor.UpdatePermissionsDescriptions(referencePermissions: servicePrincipalPermissionsDict,
@@ -53,12 +53,12 @@ namespace PermissionsScraper.Services.Tests
             Assert.NotEmpty(referencePermissionsDictionary);
         }
 
-        private static async Task<string> GetGitHubPermissionsDescriptionsText()
+        private static async Task<string> GetGitHubPermissionsDescriptionsTextAsync()
         {
             return await Resources.GetFileContents(".\\Resources\\GitHubScopesDescriptions.json");
         }
 
-        private static async Task<string> GetServicePrincipalPermissionsDescriptionsText()
+        private static async Task<string> GetServicePrincipalPermissionsDescriptionsTextAsync()
         {
             var servicePrincipalDescriptions = await Resources.GetFileContents(".\\Resources\\ServicePrinicipalScopesDescriptions.json");
 
@@ -91,12 +91,12 @@ namespace PermissionsScraper.Services.Tests
             return PermissionsFormatHelper.ReplaceRegexPatterns(servicePrincipalDescriptions, regexMatchPatterns, regexReplacements);
         }
 
-        private static (Dictionary<string, List<Dictionary<string, object>>> servicePrincipalPermissionsDict,
-                        Dictionary<string, List<Dictionary<string, object>>> gitHubPermissionsDict)
-                        GetPermissionsDescriptionsDictionaries()
+        private static async Task<(Dictionary<string, List<Dictionary<string, object>>> servicePrincipalPermissionsDict,
+            Dictionary<string, List<Dictionary<string, object>>> gitHubPermissionsDict)>
+            GetPermissionsDescriptionsDictionariesAsync()
         {
-            var servicePrincipalPermissionsText = GetServicePrincipalPermissionsDescriptionsText().GetAwaiter().GetResult();
-            var gitHubPermissionsText = GetGitHubPermissionsDescriptionsText().GetAwaiter().GetResult();
+            var servicePrincipalPermissionsText = await GetServicePrincipalPermissionsDescriptionsTextAsync();
+            var gitHubPermissionsText = await GetGitHubPermissionsDescriptionsTextAsync();
             Assert.NotNull(servicePrincipalPermissionsText);
             Assert.NotNull(gitHubPermissionsText);
 
