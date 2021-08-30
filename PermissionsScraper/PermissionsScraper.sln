@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermissionsScraper", "Permi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHubContentUtility", "..\Submodules\msgraph-github-content-utility\GitHubContentUtility\GitHubContentUtility.csproj", "{5824D014-D95C-46E4-9A81-B97E7EDF3BDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionsScraper.Tests", "PermissionsScraper.Tests\PermissionsScraper.Tests.csproj", "{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5824D014-D95C-46E4-9A81-B97E7EDF3BDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5824D014-D95C-46E4-9A81-B97E7EDF3BDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5824D014-D95C-46E4-9A81-B97E7EDF3BDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
