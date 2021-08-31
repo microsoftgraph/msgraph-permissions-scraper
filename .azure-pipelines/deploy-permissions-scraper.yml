@@ -17,9 +17,6 @@ trigger:
 pr: none
 
 variables:
-  # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '68397ef5-9754-46e7-9572-9b15d12367f1'
-
   # Function app name
   functionAppName: 'permissionscraper'
 
@@ -82,7 +79,7 @@ stages:
           - task: AzureFunctionApp@1
             displayName: 'Azure functions app deploy'
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: $(azureSubscription)
               appType: functionApp
               appName: $(functionAppName)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
