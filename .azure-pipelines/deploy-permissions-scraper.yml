@@ -77,9 +77,8 @@ stages:
 
           steps:
           - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
             inputs:
-              azureSubscription: $(azureSubscription)
-              appType: functionApp
+              azureSubscription: 'GraphExplorer-API-ARM'
+              appType: 'functionApp'
               appName: $(functionAppName)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
