@@ -6,6 +6,9 @@ using System.Net.Http;
 
 namespace PermissionsScraper.Common
 {
+    /// <summary>
+    /// Singleton class to hold the HttpClient instance
+    /// </summary>
     internal class HttpClientSingleton
     {
         private static HttpClientSingleton _instance;
@@ -17,6 +20,10 @@ namespace PermissionsScraper.Common
             _httpClient = new HttpClient();
         }
 
+
+        /// <summary>
+        /// Gets the singleton instance of the HttpClient
+        /// </summary>
         public static HttpClientSingleton Instance
         {
             get
