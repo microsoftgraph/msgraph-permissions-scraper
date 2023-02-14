@@ -160,5 +160,26 @@ namespace PermissionsScraper.Common
 
             return string.Join(ForwardSlash, segments);
         }
+
+        /// <summary>
+        /// Removes any guid values from a uri string.
+        /// </summary>
+        /// <param name="value">The target string value.</param>
+        /// <returns>The string value with GUIDs removed.</returns>
+        public static string RemoveGuids(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            var segments = value.Split(ForwardSlash);
+            for (int i = 0; i < segments.Length; i++)
+            {
+                segments[i] = Regex.Replace(segments[i], @"^([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})$", "{id}", RegexOptions.None, TimeSpan.FromSeconds(5));
+            }
+
+            return string.Join(ForwardSlash, segments);
+        }
     }
 }
