@@ -66,6 +66,8 @@ namespace PermissionsScraper.Services
                 // Remove any '(...)' from the request url and set to lowercase for uniformity
                 string requestUrl = property.Name
                                             .UriTemplatePathFormat(true)
+                                            .RemoveGuids()
+                                            .Replace(":", string.Empty)
                                             .ToLower();
 
                 var methods = property.Children().OfType<JToken>()
