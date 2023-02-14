@@ -51,14 +51,14 @@ namespace PermissionsScraper.Services
             {
                 // Remove any '(...)' from the request url and set to lowercase for uniformity
                 string requestUrl = property.Name
-                                            .RemoveParentheses()
+                                            .UriTemplatePathFormat(true)
                                             .ToLower();
 
                 var methods = property.Children().OfType<JToken>()
                                                 .SelectMany(x => x).OfType<JProperty>()
                                                 .Select(x => x.Name).Distinct().ToList();
 
-                permPathsDictionary.Add(requestUrl, methods);
+                permPathsDictionary.TryAdd(requestUrl, methods);
             }
 
             return permPathsDictionary;
