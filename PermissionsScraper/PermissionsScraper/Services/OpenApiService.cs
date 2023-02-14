@@ -39,19 +39,15 @@ public class OpenApiService
         {
             string path = pathItem.Key;
             var operationTypes = new List<string>();
-            
-            if (path.Contains("-id"))
-            {
-                path = PathFormatHelper.RemoveIdPrefixes(pathItem.Key);
-            }
 
-            // sanitize url string to the uri template path format.
-            path = PathFormatHelper.UriTemplatePathFormat(path, true);
+            // sanitize url
+            path = path.RemoveIdPrefixes()
+                       .UriTemplatePathFormat(true);
 
             // loop through pathItem and fetch supported operation types
             foreach (var operation in pathItem.Value.Operations)
             {                
-                var operationType = operation.Key.ToString();
+                var operationType = operation.Key.ToString().ToLower();
                 operationTypes.Add(operationType);
             }
 
