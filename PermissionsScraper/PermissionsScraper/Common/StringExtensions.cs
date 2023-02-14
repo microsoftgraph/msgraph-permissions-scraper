@@ -1,14 +1,17 @@
-﻿// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 using System.Text.RegularExpressions;
 using System;
+using System.IO;
 
 namespace PermissionsScraper.Common
 {
     public static class StringExtensions
     {
+        private const char ForwardSlash = '/';
+        
         /// <summary>
         /// Change the input string's line breaks
         /// </summary>
@@ -63,7 +66,6 @@ namespace PermissionsScraper.Common
             }
 
             const string GraphNamespace = "microsoft.graph";
-            const char ForwardSlash = '/';
             const char OpenParen = '(';
             const char CloseParen = ')';
             Match matchFunction = null;
@@ -129,6 +131,35 @@ namespace PermissionsScraper.Common
                 }
 
                 segments[i] = segment;
+            }
+
+            return string.Join(ForwardSlash, segments);
+        }
+
+        /// <summary>
+        /// Removes any id prefixes e.g {drive-id} resolves to {id}
+        /// </summary>
+        /// <param name="value">The target uri string.</param>
+        /// <returns>The sanitized Id segment.</returns>
+        public static string RemoveIdPrefixes(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+            if (!value.Contains("-id"))
+            {
+                return value;
+            }
+
+            var segments = value.Split(ForwardSlash);
+            for (int i = 0; i < segments.Length; i++)
+            {
+                if (segments[i].Contains("-id"))
+                {
+                    // e.g: {users-id}, {driveItem-id}, {educationClass-id}
+                    segments[i] = segments[i].Replace(segments[i], "{id}", StringComparison.OrdinalIgnoreCase);
+                }
             }
 
             return string.Join(ForwardSlash, segments);
