@@ -143,11 +143,7 @@ namespace PermissionsScraper.Common
         /// <returns>The sanitized Id segment.</returns>
         public static string RemoveIdPrefixes(this string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-            if (!value.Contains("-id"))
+            if (string.IsNullOrEmpty(value) || !value.Contains("-id"))
             {
                 return value;
             }
