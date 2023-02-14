@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermissionsScraper", "PermissionsScraper\PermissionsScraper.csproj", "{53A55462-BF41-43E6-AA07-3EC5414A56DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitHubContentUtility", "..\Submodules\msgraph-github-content-utility\GitHubContentUtility\GitHubContentUtility.csproj", "{5824D014-D95C-46E4-9A81-B97E7EDF3BDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionsScraper.Tests", "PermissionsScraper.Tests\PermissionsScraper.Tests.csproj", "{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PermissionsScraper.Tests", "PermissionsScraper.Tests\PermissionsScraper.Tests.csproj", "{847514BE-90F2-4B2F-ABAB-9B9C43529AB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
