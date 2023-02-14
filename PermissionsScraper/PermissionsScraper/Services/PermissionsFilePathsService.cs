@@ -56,7 +56,7 @@ namespace PermissionsScraper.Services
 
                 var methods = property.Children().OfType<JToken>()
                                                 .SelectMany(x => x).OfType<JProperty>()
-                                                .Select(x => x.Name).Distinct().ToList();
+                                                .Select(x => x.Name.ToLower()).Distinct().ToList();
 
                 permPathsDictionary.TryAdd(requestUrl, methods);
             }
