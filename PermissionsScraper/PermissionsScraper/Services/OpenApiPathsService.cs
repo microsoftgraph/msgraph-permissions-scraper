@@ -14,7 +14,7 @@ public class OpenApiPathsService
     public async Task<OpenApiDocument> FetchOpenApiDocument()
     {
         var httpClient = HttpClientSingleton.Instance.HttpClient;
-        var response = await httpClient.GetAsync("https://graphexplorerapi.azurewebsites.net/openapi?operationIds=*");
+        var response = await httpClient.GetAsync("https://graphexplorerapi.azurewebsites.net/openapi?operationIds=*&format=json");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
