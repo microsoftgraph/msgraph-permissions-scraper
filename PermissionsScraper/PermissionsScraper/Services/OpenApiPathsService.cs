@@ -9,7 +9,7 @@ using PermissionsScraper.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public class OpenApiService
+public class OpenApiPathsService
 {
     public async Task<OpenApiDocument> FetchOpenApiDocument()
     {
@@ -42,7 +42,8 @@ public class OpenApiService
 
             // sanitize url
             path = path.RemoveIdPrefixes()
-                       .UriTemplatePathFormat(true);
+                       .UriTemplatePathFormat(true)
+                       .ToLower();
 
             // loop through pathItem and fetch supported operation types
             foreach (var operation in pathItem.Value.Operations)

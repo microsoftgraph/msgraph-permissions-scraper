@@ -11,12 +11,12 @@ using Xunit;
 
 namespace PermissionsScraper.Tests.Services
 {
-    public class OpenApiServiceTests
+    public class OpenApiPathsServiceTests
     {
-        private readonly OpenApiService _openApiService;
-        public OpenApiServiceTests()
+        private readonly OpenApiPathsService _openApiService;
+        public OpenApiPathsServiceTests()
         {
-            _openApiService = new OpenApiService();
+            _openApiService = new OpenApiPathsService();
         }
 
         [Fact]
