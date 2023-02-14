@@ -9,12 +9,12 @@ using PermissionsScraper.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public class OpenApiService
+public class OpenApiPathsService
 {
     public async Task<OpenApiDocument> FetchOpenApiDocument()
     {
         var httpClient = HttpClientSingleton.Instance.HttpClient;
-        var response = await httpClient.GetAsync("https://graphexplorerapi.azurewebsites.net/openapi?operationIds=*");
+        var response = await httpClient.GetAsync("https://graphexplorerapi.azurewebsites.net/openapi?operationIds=*&format=json");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -42,7 +42,8 @@ public class OpenApiService
 
             // sanitize url
             path = path.RemoveIdPrefixes()
-                       .UriTemplatePathFormat(true);
+                       .UriTemplatePathFormat(true)
+                       .ToLower();
 
             // loop through pathItem and fetch supported operation types
             foreach (var operation in pathItem.Value.Operations)
