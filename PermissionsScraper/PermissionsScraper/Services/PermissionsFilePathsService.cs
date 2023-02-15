@@ -2,6 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PermissionsScraper.Common;
 using System;
@@ -17,12 +18,12 @@ namespace PermissionsScraper.Services
     public class PermissionsFilePathsService
     {
         /// <summary>
-        /// Gets the permission file from a url.
+        /// Gets the permission file from a url async.
         /// </summary>
         /// <param name="fileUrl">The url of the permissions file.</param>
         /// <returns>The file contents of the permissions file.</returns>
         /// <exception cref="ArgumentNullException">Exception thrown when the <paramref name="fileUrl"/> is empty or null.</exception>
-        public async Task<string> GetPermissionsFileFromUrl(string fileUrl)
+        public async Task<string> GetPermissionsFileFromUrlAsync(string fileUrl)
         {
             UtilityFunctions.CheckArgumentNullOrEmpty(fileUrl, nameof(fileUrl));
            
@@ -81,16 +82,38 @@ namespace PermissionsScraper.Services
         }
 
         /// <summary>
-        /// Gets a dictionary of paths and http methods extracted from a file at the given url. 
+        /// Gets a dictionary of paths and http methods extracted from a file at the given url async. 
         /// </summary>
         /// <param name="fileUrl">The url of the permissions file.</param>
         /// <returns>A dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
-        public async Task<Dictionary<string, List<string>>> GetPathsDictionaryFromPermissionsFileUrl(string fileUrl)
+        public async Task<Dictionary<string, List<string>>> GetPathsDictionaryFromPermissionsFileUrlAsync(string fileUrl)
         {
             UtilityFunctions.CheckArgumentNull(fileUrl, nameof(fileUrl));
 
-            var permissionsFile = await GetPermissionsFileFromUrl(fileUrl);
+            var permissionsFile = await GetPermissionsFileFromUrlAsync(fileUrl);
             return GetPathsDictionaryFromPermissionsFileContents(permissionsFile);
+        }
+
+        /// <summary>
+        /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url async. 
+        /// </summary>
+        /// <param name="fileUrl">The url of the permissions file.</param>
+        /// <returns>A serialized dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
+        public async Task<string> GetSerializedPathsDictionaryFromPermissionsFileUrlAsync(string fileUrl)
+        {
+            var pathsDictionary = await GetPathsDictionaryFromPermissionsFileUrlAsync(fileUrl);
+            return JsonConvert.SerializeObject(pathsDictionary);
+        }
+
+        /// <summary>
+        /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url. 
+        /// </summary>
+        /// <param name="fileUrl">The url of the permissions file.</param>
+        /// <returns>A serialized dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
+        public string GetSerializedPathsDictionaryFromPermissionsFileUrl(string fileUrl)
+        {
+            var pathsDictionary = GetPathsDictionaryFromPermissionsFileUrlAsync(fileUrl).GetAwaiter().GetResult();
+            return JsonConvert.SerializeObject(pathsDictionary);
         }
     }
 }
