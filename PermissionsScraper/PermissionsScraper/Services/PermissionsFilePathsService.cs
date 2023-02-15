@@ -113,7 +113,7 @@ namespace PermissionsScraper.Services
         public string GetSerializedPathsDictionaryFromPermissionsFileUrl(string fileUrl)
         {
             var pathsDictionary = GetPathsDictionaryFromPermissionsFileUrlAsync(fileUrl).GetAwaiter().GetResult();
-            return JsonConvert.SerializeObject(pathsDictionary);
+            return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
         }
     }
 }
