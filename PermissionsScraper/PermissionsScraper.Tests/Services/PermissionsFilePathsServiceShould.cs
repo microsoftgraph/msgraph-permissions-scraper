@@ -2,6 +2,7 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------using PermissionsScraper.Services;
 
+using Newtonsoft.Json;
 using PermissionsScraper.Services;
 using System;
 using System.IO;
@@ -25,8 +26,16 @@ namespace PermissionsScraper.Tests.Services
         public void GetPermissionsPaths()
         {
             // Arrange
-            PermissionsFilePathsService service = new PermissionsFilePathsService();
-            service.GetPathsDictionaryFromPermissionsFileContents(V1FileContents);
+            PermissionsFilePathsService permissionService = new PermissionsFilePathsService();
+
+            // Act
+            var permissionsPathsDictionary = permissionService.GetPathsDictionaryFromPermissionsFileContents(V1FileContents);
+
+            var test = JsonConvert.SerializeObject(permissionsPathsDictionary, Formatting.Indented);
+
+            // Assert
+            Assert.NotNull(permissionsPathsDictionary);
+            Assert.NotEmpty(permissionsPathsDictionary);
         }
     }
 }
