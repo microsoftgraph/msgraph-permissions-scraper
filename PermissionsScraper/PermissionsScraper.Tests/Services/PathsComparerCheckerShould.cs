@@ -3,13 +3,8 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using PermissionsScraper.Services;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Text.Json;
 using Xunit;
 
 namespace PermissionsScraper.Tests.Services
@@ -35,63 +30,18 @@ namespace PermissionsScraper.Tests.Services
             // Arrange
             var openApiService = new OpenApiPathsService();
             var permissionsService = new PermissionsFilePathsService();
+            var pathsComparerService = new PathsComparerService();
 
-            var openApiPathsDict = openApiService.RetrievePathsFromOpenApiDocument(_openApiDocument);
-            var permissionsPathDict = permissionsService.GetPathsDictionaryFromPermissionsFileContents(_v1FileContents);
-            var totalPaths = 0;
-                       
-            var strBuilder = new StringBuilder();
-            strBuilder.AppendLine("Paths and operations in the Permissions file not present in the OpenAPI document");
-            strBuilder.AppendLine("--------------------------------------------------------------------------------");
-                
+            Dictionary<string, List<string>> openApiPathsDict = openApiService.RetrievePathsFromOpenApiDocument(_openApiDocument);
+            Dictionary<string, List<string>> permissionsPathDict = permissionsService.GetPathsDictionaryFromPermissionsFileContents(_v1FileContents);
 
-            // Compare permissions paths with OpenAPI paths
-            foreach (var path in permissionsPathDict)
-            {
-                var pathKey = path.Key;
-                var pathValue = path.Value;
-                var pathKeyAppended = false;
-                var separatorApended = false;
+            // Act
+            var missingPathsInOpenAPIDocument = pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(openApiPathsDict, permissionsPathDict);
+            var missingPathsInPermissionsFile = pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(openApiPathsDict, permissionsPathDict);
 
-                if (openApiPathsDict.ContainsKey(pathKey))
-                {
-                    var openApiPathValue = openApiPathsDict[pathKey];
-
-                    foreach (var operation in pathValue)
-                    {
-                        if (!openApiPathValue.Contains(operation))
-                        {
-                            strBuilder.AppendLine();
-                            if (!pathKeyAppended)
-                            {
-                                strBuilder.Append(pathKey);
-                                totalPaths++;
-                                pathKeyAppended = true;
-                            }
-
-                            if (!separatorApended)
-                            {
-                                strBuilder.Append(" ---> ");
-                                separatorApended = true;
-                            }
-
-                            strBuilder.Append($" {operation} |");
-                        }
-                    }
-                }
-                else
-                {
-                    strBuilder.AppendLine();
-                    strBuilder.Append(pathKey);
-                    totalPaths++;
-                }
-            }
-
-            strBuilder.AppendLine();
-            strBuilder.AppendLine();
-            strBuilder.AppendLine("Total Paths --> " + totalPaths);
-
-            var output = strBuilder.ToString();            
+            // Assert
+            Assert.NotNull(missingPathsInOpenAPIDocument);
+            Assert.NotEmpty(missingPathsInPermissionsFile);          
         }
     }
 }
