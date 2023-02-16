@@ -63,12 +63,12 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// Graph paths from Permissions file
         /// </summary>
-        public string GraphPermissionsFilePaths { get; set; }
+        public Dictionary<string, string> GraphPermissionsFilePaths { get; set; }
 
         /// <summary>
         /// Graph paths from OpenApi file
         /// </summary>
-        public string GraphOpenApiFilePaths { get; set; }
+        public Dictionary<string, string> GraphOpenApiFilePaths { get; set; }
         
         /// <summary>
         /// The string value to replace the matched regex pattern
