@@ -74,23 +74,7 @@ namespace PermissionsScraper.Triggers
                     return;
                 }
 
-                var gitHubAppConfig = new GitHubRepoAppConfig
-                {
-                    GitHubAppId = permissionsAppConfig.GitHubAppId,
-                    GitHubOrganization = permissionsAppConfig.GitHubOrganization,
-                    GitHubAppName = permissionsAppConfig.GitHubAppName,
-                    GitHubRepoName = permissionsAppConfig.GitHubRepoName,
-                    ReferenceBranch = permissionsAppConfig.ReferenceBranch,
-                    FileContentPath = permissionsAppConfig.FileContentPath,
-                    WorkingBranch = permissionsAppConfig.WorkingBranch,
-                    Reviewers = permissionsAppConfig.Reviewers,
-                    PullRequestTitle = permissionsAppConfig.PullRequestTitle,
-                    PullRequestBody = permissionsAppConfig.PullRequestBody,
-                    PullRequestLabels = permissionsAppConfig.PullRequestLabels,
-                    PullRequestAssignees = permissionsAppConfig.PullRequestAssignees,
-                    CommitMessage = permissionsAppConfig.CommitMessage,
-                    TreeItemMode = Enums.TreeItemMode.Blob
-                };
+                var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig);
 
                 log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");
@@ -115,7 +99,8 @@ namespace PermissionsScraper.Triggers
                     return;
                 }
 
-                gitHubAppConfig.FileContent = JsonConvert.SerializeObject(_updatedGithubPermissions, Formatting.Indented).ChangeLineBreaks();
+                var updatedPermissionsString = JsonConvert.SerializeObject(_updatedGithubPermissions, Formatting.Indented).ChangeLineBreaks();
+                gitHubAppConfig.FileContents.Add(Constants.PermissionsDescriptions, updatedPermissionsString);
 
                 log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");

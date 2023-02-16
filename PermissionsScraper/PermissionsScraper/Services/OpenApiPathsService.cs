@@ -5,16 +5,15 @@
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using PermissionsScraper.Common;
-using PermissionsScraper.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 public class OpenApiPathsService
 {
-    public async Task<OpenApiDocument> FetchOpenApiDocument()
+    public async Task<OpenApiDocument> FetchOpenApiDocument(string fileUrl)
     {
         var httpClient = HttpClientSingleton.Instance.HttpClient;
-        var response = await httpClient.GetAsync("https://graphexplorerapi.azurewebsites.net/openapi?operationIds=*&format=json");
+        var response = await httpClient.GetAsync(fileUrl);
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -30,8 +29,9 @@ public class OpenApiPathsService
     /// </summary>
     /// <param name="doc"></param>
     /// <returns>A dictionary of pathItems with the corresponding operation types supported.</returns>
-    public Dictionary<string, List<string>> RetrievePathsFromOpenApiDocument(OpenApiDocument doc)
+    public async Task<Dictionary<string, List<string>>> RetrievePathsFromOpenApiDocument(string fileUrl)
     {
+        var doc = await FetchOpenApiDocument(fileUrl);
         var pathItems = new Dictionary<string, List<string>>();
         
         // loop through the document and fetch paths
@@ -57,5 +57,16 @@ public class OpenApiPathsService
 
         return pathItems;
     }
-        
+
+    /// <summary>
+    /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url. 
+    /// </summary>
+    /// <param name="fileUrl">The url of the permissions file.</param>
+    /// <returns>A serialized dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
+    public async Task<string> GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(string fileUrl)
+    {
+        var pathsDictionary = await RetrievePathsFromOpenApiDocument(fileUrl);
+        return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
+    }
+
 }

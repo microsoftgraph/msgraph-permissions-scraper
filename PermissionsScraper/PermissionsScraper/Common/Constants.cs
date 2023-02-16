@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -15,5 +15,7 @@ namespace PermissionsScraper.Common
         public static string PathsNotInPermissionsFileBeta = "PathsNotInPermissionsFileBeta";
         public static string PathsNotInOpenApiDocumentV1 = "PathsNotInOpenApiDocumentV1";
         public static string PathsNotInOpenApiDocumentBeta = "PathsNotInOpenApiDocumentBeta";
+        public static string V1 = "v1.0";
+        public static string Beta = "beta";
     }
 }

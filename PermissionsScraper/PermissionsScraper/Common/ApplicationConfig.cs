@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +59,17 @@ namespace PermissionsScraper.Common
         /// The regex pattern to match on the retrieved Service Principal JSON data
         /// </summary>
         public Dictionary<string, string> RegexPatterns { get; set; }
+        
+        /// <summary>
+        /// Graph paths from Permissions file
+        /// </summary>
+        public string GraphPermissionsFilePaths { get; set; }
 
+        /// <summary>
+        /// Graph paths from OpenApi file
+        /// </summary>
+        public string GraphOpenApiFilePaths { get; set; }
+        
         /// <summary>
         /// The string value to replace the matched regex pattern
         /// </summary>
@@ -113,14 +123,14 @@ namespace PermissionsScraper.Common
         public string ReferenceBranch { get; set; }
 
         /// <summary>
-        /// The file path of a file content in a repository branch
+        /// The paths of file contents in a repository branch
         /// </summary>
-        public string FileContentPath { get; set; }
+        public Dictionary<string, string> FileContentPaths { get; set; }
 
         /// <summary>
-        /// The string contents of a file in a respository branch
-        /// </summary>
-        public string FileContent { get; set; }
+        /// The string contents of files in a respository branch
+        /// </summary> 
+        public Dictionary<string, string> FileContents { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// The commit message
