@@ -8,6 +8,7 @@ using PermissionsScraper.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace PermissionsScraper.Services
@@ -27,8 +28,8 @@ namespace PermissionsScraper.Services
         {
             UtilityFunctions.CheckArgumentNullOrEmpty(fileUrl, nameof(fileUrl));
            
-            var client = HttpClientSingleton.Instance;
-            using var response = await client.HttpClient.GetAsync(fileUrl);
+            var client = new HttpClient();
+            using var response = await client.GetAsync(fileUrl);
             if (!response.IsSuccessStatusCode)
             {
                 throw new Exception("Failed to get the file at the provided url: " + fileUrl);
@@ -114,6 +115,17 @@ namespace PermissionsScraper.Services
         {
             var pathsDictionary = GetPathsDictionaryFromPermissionsFileUrlAsync(fileUrl).GetAwaiter().GetResult();
             return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
+        }
+
+        /// <summary>
+        /// Gets a dictionary of paths and http methods extracted from a serialized paths dictionary.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public Dictionary<string, List<string>> DeserializePermissionsPathDictionary(string content)
+        {
+            UtilityFunctions.CheckArgumentNullOrEmpty(content, nameof(content));
+            return JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(content);
         }
     }
 }

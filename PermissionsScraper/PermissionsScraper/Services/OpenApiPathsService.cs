@@ -3,25 +3,26 @@
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Writers;
 using Newtonsoft.Json;
 using PermissionsScraper.Common;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 public class OpenApiPathsService
 {
     public async Task<OpenApiDocument> FetchOpenApiDocument(string fileUrl)
     {
-        var httpClient = HttpClientSingleton.Instance.HttpClient;
-        var response = await httpClient.GetAsync(fileUrl);
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var openApiDocument = JsonConvert.DeserializeObject<OpenApiDocument>(content);
-            return openApiDocument;
-        }
-
-        return null;
+        var httpClient = new HttpClient();
+        httpClient.Timeout = TimeSpan.FromMinutes(5);
+        var responseStream = await httpClient.GetStreamAsync(fileUrl);
+        var reader = new OpenApiStreamReader();
+        return reader.Read(responseStream, out _);
     }
 
     /// <summary>
@@ -58,6 +59,36 @@ public class OpenApiPathsService
         return pathItems;
     }
 
+
+    public Dictionary<string, List<string>> RetrievePathsFromOpenApiDocument(OpenApiDocument doc)
+    {        
+        var pathItems = new Dictionary<string, List<string>>();
+
+        // loop through the document and fetch paths
+        foreach (var pathItem in doc.Paths)
+        {
+            string path = pathItem.Key;
+            var operationTypes = new List<string>();
+
+            // sanitize url
+            path = path.RemoveIdPrefixes()
+                       .UriTemplatePathFormat(true)
+                       .ToLower();
+
+            // loop through pathItem and fetch supported operation types
+            foreach (var operation in pathItem.Value.Operations)
+            {
+                var operationType = operation.Key.ToString().ToLower();
+                operationTypes.Add(operationType);
+            }
+
+            pathItems.TryAdd(path, operationTypes);
+        }
+
+        return pathItems;
+    }
+
+
     /// <summary>
     /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url. 
     /// </summary>
@@ -66,6 +97,12 @@ public class OpenApiPathsService
     public async Task<string> GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(string fileUrl)
     {
         var pathsDictionary = await RetrievePathsFromOpenApiDocument(fileUrl);
+        return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
+    }
+
+    public string GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(OpenApiDocument doc)
+    {
+        var pathsDictionary = RetrievePathsFromOpenApiDocument(doc);
         return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
     }
 

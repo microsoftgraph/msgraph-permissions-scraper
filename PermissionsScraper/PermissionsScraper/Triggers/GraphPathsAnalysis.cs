@@ -36,7 +36,7 @@ namespace PermissionsScraper.Triggers
                 log.LogInformation($"Writing updated Graph paths files into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
-                BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+              //  BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 log.LogInformation($"Finished updating Graph paths files into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
@@ -75,38 +75,39 @@ namespace PermissionsScraper.Triggers
         {
             // Graph version urls for both openApi and permissions files
             var permissionsFileV1Url = permissionsAppConfig.GraphPermissionsFilePaths[Constants.V1];
-            var permissionsFileBetaUrl = permissionsAppConfig.GraphPermissionsFilePaths[Constants.V1];
+            var permissionsFileBetaUrl = permissionsAppConfig.GraphPermissionsFilePaths[Constants.Beta];
             var openApiFileV1Url = permissionsAppConfig.GraphOpenApiFilePaths[Constants.V1];
-            var openApiFileBetaUrl = permissionsAppConfig.GraphOpenApiFilePaths[Constants.Beta];
+            //  var openApiFileBetaUrl = permissionsAppConfig.GraphOpenApiFilePaths[Constants.Beta];
+             var openApiDocV1 = _openApiPathsService.FetchOpenApiDocument(openApiFileV1Url).GetAwaiter().GetResult();
 
             // Permissions and OpenApi file contents
-            var permissionsFileContentV1 = _permissionsFilePathsService.GetSerializedPathsDictionaryFromPermissionsFileUrl(permissionsFileV1Url);
+            var permissionsFileContent_V1 = _permissionsFilePathsService.GetSerializedPathsDictionaryFromPermissionsFileUrl(permissionsFileV1Url);
             var permissionsFileContentBeta = _permissionsFilePathsService.GetSerializedPathsDictionaryFromPermissionsFileUrl(permissionsFileBetaUrl);
-            var openApiFileContentV1 = _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(openApiFileV1Url).Result;
-            var openApiFileContentBeta = _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(openApiFileBetaUrl).Result;
+            var openApiFileContentV1 = _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(openApiDocV1);
+          //  var openApiFileContentBeta = _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(openApiFileBetaUrl).Result;
 
             // Permissions and OpenApi paths dictionaries
-            var permissionsPathDictV1 = _permissionsFilePathsService.GetPathsDictionaryFromPermissionsFileContents(permissionsFileV1Url);
-            var permissionsPathDictBeta = _permissionsFilePathsService.GetPathsDictionaryFromPermissionsFileContents(permissionsFileBetaUrl);
-            var openApiPathsDictV1 = _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiFileV1Url).Result;
-            var openApiPathsDictBeta = _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiFileBetaUrl).Result;
+            var permissionsPathDict_V1 = _permissionsFilePathsService.DeserializePermissionsPathDictionary(permissionsFileContent_V1);
+            // var permissionsPathDictBeta = _permissionsFilePathsService.DeserializePermissionsPathDictionary(permissionsFileBetaUrl);
+            var openApiPathsDictV1 = _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiDocV1);
+           // var openApiPathsDictBeta = _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiFileBetaUrl).Result;
 
             // missing paths in openApi and permissions files for both v1 and beta
-            var missingPathsInOpenApiV1 = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(permissionsPathDictV1, openApiPathsDictV1);
-            var missingPathsInOpenApiBeta = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(permissionsPathDictBeta, openApiPathsDictBeta);
-            var missingPathsInPermissionsV1 = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(permissionsPathDictV1, openApiPathsDictV1);
-            var missingPathsInPermissionsBeta = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(permissionsPathDictBeta, openApiPathsDictBeta);
+            var missingPathsInOpenApiV1 = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(openApiPathsDictV1, permissionsPathDict_V1);
+          //  var missingPathsInOpenApiBeta = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(permissionsPathDictBeta, openApiPathsDictBeta);
+            var missingPathsInPermissionsV1 = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(openApiPathsDictV1, permissionsPathDict_V1);
+          //  var missingPathsInPermissionsBeta = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(permissionsPathDictBeta, openApiPathsDictBeta);
 
             var contentDictionary = new Dictionary<string, string>
                 {
                     { Constants.OpenApiPathsV1 , openApiFileContentV1 },
-                    { Constants.OpenApiPathsBeta, openApiFileContentBeta },
-                    { Constants.PermissionsPathsV1, permissionsFileContentV1 },
+                  //  { Constants.OpenApiPathsBeta, openApiFileContentBeta },
+                    { Constants.PermissionsPathsV1, permissionsFileContent_V1 },
                     { Constants.PermissionsPathsBeta, permissionsFileContentBeta },
                     { Constants.PathsNotInOpenApiDocumentV1, missingPathsInOpenApiV1 },
-                    { Constants.PathsNotInOpenApiDocumentBeta, missingPathsInOpenApiBeta },
+                  //  { Constants.PathsNotInOpenApiDocumentBeta, missingPathsInOpenApiBeta },
                     { Constants.PathsNotInPermissionsFileV1, missingPathsInPermissionsV1 },
-                    { Constants.PathsNotInPermissionsFileBeta, missingPathsInPermissionsBeta }
+                  //  { Constants.PathsNotInPermissionsFileBeta, missingPathsInPermissionsBeta }
                 };
 
             foreach (var item in contentDictionary)
