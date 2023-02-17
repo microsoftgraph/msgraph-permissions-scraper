@@ -74,7 +74,8 @@ namespace PermissionsScraper.Triggers
                     return;
                 }
 
-                var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig);
+                var resourceType = Constants.PermissionsDescriptions;
+                var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig, resourceType);
 
                 log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
                     $"Time: {DateTime.UtcNow}");

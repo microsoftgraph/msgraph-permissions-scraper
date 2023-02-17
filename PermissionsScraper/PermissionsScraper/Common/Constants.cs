@@ -17,5 +17,6 @@ namespace PermissionsScraper.Common
         public static string PathsNotInOpenApiDocumentBeta = "PathsNotInOpenApiDocumentBeta";
         public static string V1 = "v1.0";
         public static string Beta = "beta";
+        public static string GraphPathsFiles = "GraphPathsFiles";
     }
 }

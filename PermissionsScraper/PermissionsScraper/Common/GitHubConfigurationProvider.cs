@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
+using PermissionsScraper.Common;
 
 namespace PermissionsScraper.Services
 {
@@ -29,7 +30,7 @@ namespace PermissionsScraper.Services
             return permissionsAppConfig;
         }
         
-        internal static GitHubRepoAppConfig SetGitHubConfiguration(PermissionsAppConfig permissionsAppConfig)
+        internal static GitHubRepoAppConfig SetGitHubConfiguration(PermissionsAppConfig permissionsAppConfig, string resourceType)
         {
             var gitHubAppConfig = new GitHubRepoAppConfig
             {
@@ -41,8 +42,8 @@ namespace PermissionsScraper.Services
                 FileContentPaths = permissionsAppConfig.FileContentPaths,
                 WorkingBranch = permissionsAppConfig.WorkingBranch,
                 Reviewers = permissionsAppConfig.Reviewers,
-                PullRequestTitle = permissionsAppConfig.PullRequestTitle,
-                PullRequestBody = permissionsAppConfig.PullRequestBody,
+                PullRequestTitle = permissionsAppConfig.PullRequestTitles[resourceType],
+                PullRequestBody = permissionsAppConfig.PullRequestBodies[resourceType],
                 PullRequestLabels = permissionsAppConfig.PullRequestLabels,
                 PullRequestAssignees = permissionsAppConfig.PullRequestAssignees,
                 CommitMessage = permissionsAppConfig.CommitMessage,

@@ -140,12 +140,12 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// Pull request title
         /// </summary>
-        public string PullRequestTitle { get; set; }
+        public Dictionary<string, string> PullRequestTitles { get; set; }
 
         /// <summary>
         /// Pull request message
         /// </summary>
-        public string PullRequestBody { get; set; }
+        public Dictionary<string, string> PullRequestBodies { get; set; }
 
         /// <summary>
         /// List of pull request reviewers

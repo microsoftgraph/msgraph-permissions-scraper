@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
+using GitHubContentUtility.Common;
 using GitHubContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
 using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
+using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using Octokit;
 using PermissionsScraper.Common;
+using System.Linq;
 
 namespace PermissionsScraper.Triggers
 {
@@ -29,7 +34,8 @@ namespace PermissionsScraper.Triggers
             {
                 var permissionsAppConfig = GithubConfigurationProvider.Authenticate(log);
 
-                var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig);
+                var resourceType = Constants.GraphPathsFiles;
+                var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig, resourceType);
 
                 gitHubAppConfig.FileContents = GetGraphPathsFileContent(permissionsAppConfig, gitHubAppConfig.FileContents);
 
