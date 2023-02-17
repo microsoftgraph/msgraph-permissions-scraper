@@ -4,14 +4,11 @@
 
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Writers;
 using Newtonsoft.Json;
 using PermissionsScraper.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 public class OpenApiPathsService

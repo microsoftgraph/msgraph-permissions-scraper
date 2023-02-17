@@ -138,12 +138,12 @@ namespace PermissionsScraper.Common
         public string CommitMessage { get; set; }
 
         /// <summary>
-        /// Pull request title
+        /// Pull request titles
         /// </summary>
         public Dictionary<string, string> PullRequestTitles { get; set; }
 
         /// <summary>
-        /// Pull request message
+        /// Pull request messages
         /// </summary>
         public Dictionary<string, string> PullRequestBodies { get; set; }
 

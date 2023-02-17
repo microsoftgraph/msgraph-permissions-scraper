@@ -11,10 +11,10 @@ namespace PermissionsScraper.Common
         public static string OpenApiPathsBeta = "OpenApiPathsBeta";
         public static string PermissionsPathsV1 = "PermissionsPathsV1";
         public static string PermissionsPathsBeta = "PermissionsPathsBeta";
-        public static string PathsNotInPermissionsFileV1 = "PathsNotInPermissionsFileV1";
-        public static string PathsNotInPermissionsFileBeta = "PathsNotInPermissionsFileBeta";
-        public static string PathsNotInOpenApiDocumentV1 = "PathsNotInOpenApiDocumentV1";
-        public static string PathsNotInOpenApiDocumentBeta = "PathsNotInOpenApiDocumentBeta";
+        public static string MissingPathsInPermissionsFileV1 = "MissingPathsInPermissionsFileV1";
+        public static string MissingPathsInPermissionsFileBeta = "MissingPathsInPermissionsFileBeta";
+        public static string MissingPathsInOpenApiDocumentV1 = "MissingPathsInOpenApiDocumentV1";
+        public static string MissingPathsInOpenApiDocumentBeta = "MissingPathsInOpenApiDocumentBeta";
         public static string V1 = "v1.0";
         public static string Beta = "beta";
         public static string GraphPathsFiles = "GraphPathsFiles";

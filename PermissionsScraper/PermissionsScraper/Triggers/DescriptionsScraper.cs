@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using GitHubContentUtility.Common;
 using GitHubContentUtility.Operations;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,6 @@ using Newtonsoft.Json;
 using PermissionsScraper.Helpers;
 using PermissionsScraper.Services;
 using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
-using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using Octokit;
 using PermissionsScraper.Common;
 using System.Linq;
@@ -35,110 +33,110 @@ namespace PermissionsScraper.Triggers
         {
             //log.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
 
-            //try
-            //{
-            //    log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
+            try
+            {
+                log.LogInformation($"Authenticating into the Web API... Time: {DateTime.UtcNow}");
 
-            //    PermissionsAppConfig permissionsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
-            //    var authResult = AuthService.GetAuthentication(permissionsAppConfig);
+                PermissionsAppConfig permissionsAppConfig = PermissionsAppConfig.ReadFromJsonFile("local.settings.json");
+                var authResult = AuthService.GetAuthentication(permissionsAppConfig);
 
-            //    if (authResult == null)
-            //    {
-            //        log.LogInformation($"Failed to get authentication into the Web API. Time: {DateTime.UtcNow}");
-            //        return;
-            //    }
+                if (authResult == null)
+                {
+                    log.LogInformation($"Failed to get authentication into the Web API. Time: {DateTime.UtcNow}");
+                    return;
+                }
 
-            //    log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Successfully authenticated into the Web API. Time: {DateTime.UtcNow}");
 
-            //    _servicePrincipalPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
-            //    if (permissionsAppConfig.ApiVersions?.Length > 0)
-            //    {
-            //        foreach (string apiVersion in permissionsAppConfig.ApiVersions)
-            //        {
-            //            log.LogInformation($"Fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
+                _servicePrincipalPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
+                if (permissionsAppConfig.ApiVersions?.Length > 0)
+                {
+                    foreach (string apiVersion in permissionsAppConfig.ApiVersions)
+                    {
+                        log.LogInformation($"Fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
 
-            //            var spPermissionsDescriptions = FetchServicePrincipalPermissionsDescriptions(permissionsAppConfig, authResult.AccessToken, apiVersion);
-            //            PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
-            //                                                                              spPermissionsDescriptions,
-            //                                                                              ref _servicePrincipalPermissions,
-            //                                                                              permissionsAppConfig.TopLevelDictionaryName);
+                        var spPermissionsDescriptions = FetchServicePrincipalPermissionsDescriptions(permissionsAppConfig, authResult.AccessToken, apiVersion);
+                        PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
+                                                                                          spPermissionsDescriptions,
+                                                                                          ref _servicePrincipalPermissions,
+                                                                                          permissionsAppConfig.TopLevelDictionaryName);
 
-            //            log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
-            //        }
-            //    }
+                        log.LogInformation($"Finished fetching Service Principal permissions descriptions for {apiVersion}. Time: {DateTime.UtcNow}");
+                    }
+                }
 
-            //    if (!_servicePrincipalPermissions.Any())
-            //    {
-            //        log.LogInformation($"{nameof(_servicePrincipalPermissions)} dictionary returned empty data. " +
-            //            $"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
-            //        return;
-            //    }
+                if (!_servicePrincipalPermissions.Any())
+                {
+                    log.LogInformation($"{nameof(_servicePrincipalPermissions)} dictionary returned empty data. " +
+                        $"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
+                    return;
+                }
 
                 var resourceType = Constants.PermissionsDescriptions;
                 var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig, resourceType);
 
-            //    log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
-            //        $"Time: {DateTime.UtcNow}");
+                log.LogInformation($"Fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
+                    $"Time: {DateTime.UtcNow}");
 
-            //    var githubPermissionsText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
-            //        permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
-            //    _updatedGithubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
-            //    PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
-            //                                                                      githubPermissionsText,
-            //                                                                      ref _updatedGithubPermissions);
+                var githubPermissionsText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig,
+                    permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                _updatedGithubPermissions = new Dictionary<string, List<Dictionary<string, object>>>();
+                PermissionsProcessor.ExtractPermissionsDescriptionsIntoDictionary(permissionsAppConfig.ScopesNames,
+                                                                                  githubPermissionsText,
+                                                                                  ref _updatedGithubPermissions);
 
-            //    log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
-            //        $"Time: {DateTime.UtcNow}");
+                log.LogInformation($"Finished fetching permissions descriptions from GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}'. " +
+                    $"Time: {DateTime.UtcNow}");
 
-            //    log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}' " +
-            //        $"for new updates... Time: {DateTime.UtcNow}");
+                log.LogInformation($"Comparing scopes from the Service Principal and the GitHub repository '{gitHubAppConfig.GitHubRepoName}', branch '{permissionsAppConfig.ReferenceBranch}' " +
+                    $"for new updates... Time: {DateTime.UtcNow}");
 
-            //    bool permissionsUpdated = PermissionsProcessor.UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _updatedGithubPermissions);
-            //    if (permissionsUpdated is false)
-            //    {
-            //        log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
-            //        return;
-            //    }
+                bool permissionsUpdated = PermissionsProcessor.UpdatePermissionsDescriptions(_servicePrincipalPermissions, ref _updatedGithubPermissions);
+                if (permissionsUpdated is false)
+                {
+                    log.LogInformation($"No permissions descriptions update required. Exiting function 'DescriptionsScraper'. Time: {DateTime.UtcNow}");
+                    return;
+                }
 
-            //    var updatedPermissionsString = JsonConvert.SerializeObject(_updatedGithubPermissions, Formatting.Indented).ChangeLineBreaks();
-            //    gitHubAppConfig.FileContents.Add(Constants.PermissionsDescriptions, updatedPermissionsString);
+                var updatedPermissionsString = JsonConvert.SerializeObject(_updatedGithubPermissions, Formatting.Indented).ChangeLineBreaks();
+                gitHubAppConfig.FileContents.Add(Constants.PermissionsDescriptions, updatedPermissionsString);
 
-            //    log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
-            //        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Writing updated Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                    $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
-            //    BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
-            //    log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
-            //        $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Finished updating Service Principal permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
+                    $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
-            //    log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
-            //        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                    $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
 
-            //    PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
-            //    log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
-            //        $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
+                log.LogInformation($"Finished creating PR for updated Service Principal permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
+                    $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
 
-            //    log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
-            //}
-            //catch (ApiException ex)
-            //{
-            //    if (ex.ApiError.Errors != null)
-            //    {
-            //        foreach (var item in ex.ApiError.Errors)
-            //        {
-            //            log.LogInformation($"Exception occurred: {item.Message} Time: {DateTime.UtcNow}");
-            //        }
-            //        return;
-            //    }
+                log.LogInformation($"Exiting function DescriptionsScraper. Time: {DateTime.UtcNow}");
+            }
+            catch (ApiException ex)
+            {
+                if (ex.ApiError.Errors != null)
+                {
+                    foreach (var item in ex.ApiError.Errors)
+                    {
+                        log.LogInformation($"Exception occurred: {item.Message} Time: {DateTime.UtcNow}");
+                    }
+                    return;
+                }
 
-            //    log.LogInformation($"Exception occurred: {ex.ApiError.Message} Time: {DateTime.UtcNow}");
-            //}
-            //catch (Exception ex)
-            //{
-            //    log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message} Time: {DateTime.UtcNow}");
-            //    log.LogInformation($"Exception stack trace: {ex.StackTrace}");
-            //}
+                log.LogInformation($"Exception occurred: {ex.ApiError.Message} Time: {DateTime.UtcNow}");
+            }
+            catch (Exception ex)
+            {
+                log.LogInformation($"Exception occurred: {ex.InnerException?.Message ?? ex.Message} Time: {DateTime.UtcNow}");
+                log.LogInformation($"Exception stack trace: {ex.StackTrace}");
+            }
         }
 
         /// <summary>
