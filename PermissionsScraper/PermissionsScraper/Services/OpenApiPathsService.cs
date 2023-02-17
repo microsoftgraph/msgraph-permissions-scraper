@@ -18,8 +18,10 @@ public class OpenApiPathsService
 {
     public async Task<OpenApiDocument> FetchOpenApiDocument(string fileUrl)
     {
-        var httpClient = new HttpClient();
-        httpClient.Timeout = TimeSpan.FromMinutes(5);
+        var httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromMinutes(5)
+        };
         var responseStream = await httpClient.GetStreamAsync(fileUrl);
         var reader = new OpenApiStreamReader();
         return reader.Read(responseStream, out _);
