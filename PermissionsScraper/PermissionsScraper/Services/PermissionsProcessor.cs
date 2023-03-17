@@ -2,9 +2,10 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using PermissionsScraper.Common;
+using PermissionsScraper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,10 @@ namespace PermissionsScraper.Services
 {
     internal class PermissionsProcessor
     {
+        private const string DelegatedWork = "DelegatedWork";
+        private const string DelegatedPersonal = "DelegatedPersonal";
+        private const string Application = "Application";
+
         /// <summary>
         /// Extracts permissions descriptions from a string input source
         /// and adds them to a target permissions descriptions dictionary.
@@ -34,6 +39,48 @@ namespace PermissionsScraper.Services
                 : JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText).Value<JArray>(topLevelDictionaryName)?.First;
 
             ExtractPermissionsDescriptionsIntoDictionary(scopesNames, permissionsDescriptionsToken, ref referencePermissionsDictionary);
+        }
+
+        /// <summary>
+        /// Extracts permissions descriptions from schemes source and adds them to a target permissions descriptions dictionary.
+        /// </summary>
+        /// <param name="permissionsDocument">The <see cref="PermissionsDocument"/> input with permissions descriptions.</param>
+        /// <returns>A dictionary of all permissions grouped by permission scheme.</returns>
+        public static Dictionary<string, List<ScopeInformation>> ExtractPermissionDescriptionsIntoDictionary(
+            PermissionsDocument permissionsDocument)
+        {
+            UtilityFunctions.CheckArgumentNull(permissionsDocument, nameof(permissionsDocument));
+
+            var permissionDescriptions = new Dictionary<string, List<ScopeInformation>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { DelegatedWork, new List<ScopeInformation>() },
+                { DelegatedPersonal, new List<ScopeInformation>() },
+                { Application, new List<ScopeInformation>() }
+            };
+
+            foreach (var permission in permissionsDocument.Permissions)
+            {
+                foreach (var schemesDescriptions in permission.Value.Schemes)
+                {
+                    if (!permissionDescriptions.TryGetValue(schemesDescriptions.Key, out var allSchemePermissions))
+                    {
+                        throw new InvalidOperationException($"Invalid scheme key {schemesDescriptions.Key}");
+                    }
+
+                    var scopeInformation = new ScopeInformation()
+                    {
+                        ScopeName = permission.Key,
+                        AdminDisplayName = schemesDescriptions.Value.AdminDisplayName,
+                        AdminDescription= schemesDescriptions.Value.AdminDescription,
+                        ConsentDisplayName = schemesDescriptions.Value.UserDisplayName,
+                        ConsentDescription = schemesDescriptions.Value.UserDescription,
+                        IsAdmin = schemesDescriptions.Value.RequiresAdminConsent,
+                        IsHidden = permission.Value.ProvisioningInfo.IsHidden
+                    };
+                    allSchemePermissions.Add(scopeInformation);
+                }
+            }
+            return permissionDescriptions;
         }
 
         /// <summary>
@@ -143,6 +190,62 @@ namespace PermissionsScraper.Services
             }
 
             return permissionsUpdated;
+        }
+
+        /// <summary>
+        /// Creates permissions reverse lookup table from permissions document obtained from workloads repo.
+        /// </summary>
+        /// <param name="permissionsDocument">The <see cref="PermissionsDocument"/> input with permissions descriptions.</param>
+        /// <returns>Permissions reverse lookup table with the key as the request URL.</returns>
+        public static Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>> CreatePermissionsReverseLookupTable(
+            PermissionsDocument permissionsDocument)
+        {
+            UtilityFunctions.CheckArgumentNull(permissionsDocument, nameof(permissionsDocument));
+
+            var reverseLookupTable = new Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>>();
+            foreach (var permission in permissionsDocument.Permissions)
+            {
+                foreach (var pathSet in permission.Value.PathSets)
+                {
+                    foreach (var path in pathSet.Paths)
+                    {
+                        if (!reverseLookupTable.TryGetValue(path.Key, out var pathPermissions))
+                        {
+                            pathPermissions = new Dictionary<string, Dictionary<string, SchemePermissions>>();
+                            reverseLookupTable.Add(path.Key, pathPermissions);
+                        }
+
+                        var leastPrivilegeSchemes = !string.IsNullOrEmpty(path.Value) 
+                            ? path.Value.Split("=")[1].Split(',', StringSplitOptions.RemoveEmptyEntries) 
+                            : new string[0];
+
+                        foreach (var method in pathSet.Methods)
+                        {
+                            if (!pathPermissions.TryGetValue(method, out var supportedMethodPermissions))
+                            {
+                                supportedMethodPermissions = new Dictionary<string, SchemePermissions>();
+                                pathPermissions.Add(method, supportedMethodPermissions);
+                            }
+
+                            foreach (var schemeKey in pathSet.SchemeKeys)
+                            {
+                                if (!supportedMethodPermissions.TryGetValue(schemeKey, out var schemePermissions))
+                                {
+                                    schemePermissions = new SchemePermissions();
+                                    supportedMethodPermissions.Add(schemeKey, schemePermissions);
+                                }
+
+                                schemePermissions.AllPermissions.Add(permission.Key);
+                                if (leastPrivilegeSchemes.Contains(schemeKey))
+                                {
+                                    schemePermissions.LeastPrivilegePermissions.Add(permission.Key);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return reverseLookupTable;
         }
     }
 }
