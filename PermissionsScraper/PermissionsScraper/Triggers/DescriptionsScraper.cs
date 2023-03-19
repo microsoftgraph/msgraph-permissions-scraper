@@ -161,7 +161,7 @@ namespace PermissionsScraper.Triggers
                 logger.LogInformation($"Creating PR for updated permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
                     $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
 
-               PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
+                PullRequestCreator.CreatePullRequestAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 logger.LogInformation($"Finished creating PR for updated permissions descriptions in GitHub repository '{gitHubAppConfig.GitHubRepoName}'" +
                     $" from branch '{gitHubAppConfig.WorkingBranch}' into branch '{gitHubAppConfig.ReferenceBranch}'. Time: {DateTime.UtcNow}");
