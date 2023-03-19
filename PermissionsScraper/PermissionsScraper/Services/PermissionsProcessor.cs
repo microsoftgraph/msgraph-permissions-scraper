@@ -80,6 +80,12 @@ namespace PermissionsScraper.Services
                     allSchemePermissions.Add(scopeInformation);
                 }
             }
+
+            foreach (var schemeScopes in permissionDescriptions.Values)
+            {
+                schemeScopes.Sort((x, y) => x.ScopeName.CompareTo(y.ScopeName));
+            }
+
             return permissionDescriptions;
         }
 
@@ -245,7 +251,7 @@ namespace PermissionsScraper.Services
                     }
                 }
             }
-            return reverseLookupTable;
+            return reverseLookupTable.OrderBy(x => x.Key).ToDictionary(k => k.Key, v => v.Value);
         }
     }
 }
