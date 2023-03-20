@@ -59,17 +59,27 @@ namespace PermissionsScraper.Common
         /// The regex pattern to match on the retrieved Service Principal JSON data
         /// </summary>
         public Dictionary<string, string> RegexPatterns { get; set; }
-        
-        /// <summary>
-        /// Graph paths from Permissions file
-        /// </summary>
-        public Dictionary<string, string> GraphPermissionsFilePaths { get; set; }
 
         /// <summary>
-        /// Graph paths from OpenApi file
+        /// Graph paths from Permissions file in production 
         /// </summary>
-        public Dictionary<string, string> GraphOpenApiFilePaths { get; set; }
-        
+        public Dictionary<string, string> ProductionPermissionsFilePaths { get; set; }
+
+        /// <summary>
+        /// Graph paths from the simplified Permissions file
+        /// </summary>
+        public Dictionary<string, string> SimplifiedPermissionsFilePaths { get; set; }
+
+        /// <summary>
+        /// Graph paths from OpenApi file in production 
+        /// </summary>
+        public Dictionary<string, string> ProductionOpenApiFilePaths { get; set; }
+
+        /// <summary>
+        /// Graph paths from the simplified OpenAPI file
+        /// </summary>
+        public Dictionary<string, string> SimplifiedOpenApiFilePaths { get; set; }
+
         /// <summary>
         /// The string value to replace the matched regex pattern
         /// </summary>
