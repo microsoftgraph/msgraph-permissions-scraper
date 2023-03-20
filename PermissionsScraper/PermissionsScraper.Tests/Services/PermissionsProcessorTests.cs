@@ -55,11 +55,11 @@ namespace PermissionsScraper.Services.Tests
             
             // Act
             var reverseLookupTable = PermissionsProcessor.CreatePermissionsReverseLookupTable(permissionsDocument);
-            string jsonResult = JsonConvert.SerializeObject(reverseLookupTable, Formatting.Indented);
+            string jsonResult = JsonConvert.SerializeObject(reverseLookupTable, Formatting.Indented).ChangeLineBreaks();
 
             // Assert
             var reverseLookupTableText = await Resources.GetFileContents(".\\Resources\\PermissionsReverseLookupTable.json");
-            Assert.Equal(reverseLookupTableText.ChangeLineBreaks(), jsonResult.ChangeLineBreaks());
+            Assert.Equal(reverseLookupTableText.ChangeLineBreaks(), jsonResult);
             Assert.Equal(118, reverseLookupTable.Keys.Count);
         }
 

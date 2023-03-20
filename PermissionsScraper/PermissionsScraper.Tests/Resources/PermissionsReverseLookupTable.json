@@ -1,4 +1,103 @@
 {
+  "/applications": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedPersonal": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedPersonal": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    },
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/addkey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/addpassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/applications(appid={value})/federatedidentitycredentials": {
     "GET": {
       "Application": {
@@ -16,6 +115,42 @@
       }
     },
     "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/federatedidentitycredentials/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/logo": {
+    "PUT": {
       "Application": {
         "leastPrivilegePermissions": [],
         "allPermissions": [
@@ -43,6 +178,234 @@
     "POST": {
       "Application": {
         "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/owners/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/removekey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/removepassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/tokenissuancepolicies": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications(appid={value})/tokenlifetimepolicies": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedPersonal": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    },
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/addkey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/addpassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/extensionproperties": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedPersonal": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/extensionproperties/{id}": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedPersonal": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    },
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
         "allPermissions": [
           "Application.ReadWrite.OwnedBy"
         ]
@@ -81,6 +444,48 @@
       }
     }
   },
+  "/applications/{id}/federatedidentitycredentials/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/logo": {
+    "PUT": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/applications/{id}/owners": {
     "GET": {
       "Application": {
@@ -113,6 +518,198 @@
       }
     }
   },
+  "/applications/{id}/owners/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/removekey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/removepassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/acquireaccesstoken": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/templates": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/templates/{id}": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/templates/{id}/schema": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PUT": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/templates/{id}/schema/filteroperators": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/synchronization/templates/{id}/schema/functions": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/tokenissuancepolicies": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/tokenissuancepolicies/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/applications/{id}/tokenlifetimepolicies": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/applications/delta": {
     "GET": {
       "Application": {
@@ -130,6 +727,18 @@
         ],
         "allPermissions": [
           "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/applicationtemplates/{id}/instantiate": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
         ]
       }
     }
@@ -156,6 +765,18 @@
       }
     },
     "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/directory/deleteditems/{id}/restore": {
+    "POST": {
       "Application": {
         "leastPrivilegePermissions": [
           "Application.ReadWrite.OwnedBy"
@@ -258,6 +879,80 @@
         ],
         "allPermissions": [
           "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/groups/{id}/approleassignments": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/groups/{id}/approleassignments/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/me/approleassignedresources": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
         ]
       }
     }
@@ -382,6 +1077,36 @@
       }
     }
   },
+  "/serviceprincipals": {
+    "GET": {
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/serviceprincipals(appid={value})": {
     "GET": {
       "Application": {
@@ -407,6 +1132,174 @@
       }
     },
     "PATCH": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/addkey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/addpassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/addtokensigningcertificate": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/approleassignedto": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/approleassignments": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/claimsmappingpolicies": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/claimsmappingpolicies/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/getpasswordsinglesignoncredentials": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/homerealmdiscoverypolicies": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/homerealmdiscoverypolicies/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/owners": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/removekey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/removepassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals(appid={value})/tokenlifetimepolicies": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
       "Application": {
         "leastPrivilegePermissions": [],
         "allPermissions": [
@@ -457,6 +1350,42 @@
       }
     }
   },
+  "/serviceprincipals/{id}/addkey": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/addpassword": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/addtokensigningcertificate": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/serviceprincipals/{id}/approleassignedto": {
     "GET": {
       "Application": {
@@ -478,6 +1407,26 @@
       }
     },
     "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/approleassignedto/{id}": {
+    "DELETE": {
       "Application": {
         "leastPrivilegePermissions": [
           "AppRoleAssignment.ReadWrite.All"
@@ -535,6 +1484,54 @@
       }
     }
   },
+  "/serviceprincipals/{id}/approleassignments/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
+        "allPermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/claimsmappingpolicies": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/claimsmappingpolicies/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/serviceprincipals/{id}/createdobjects": {
     "GET": {
       "Application": {
@@ -571,6 +1568,46 @@
         ],
         "allPermissions": [
           "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/getpasswordsinglesignoncredentials": {
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/homerealmdiscoverypolicies": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/homerealmdiscoverypolicies/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
         ]
       }
     }
@@ -649,580 +1686,8 @@
       }
     }
   },
-  "/serviceprincipals/{id}/transitivememberof": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/delta": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    }
-  },
-  "/applications": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedPersonal": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedPersonal": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    },
+  "/serviceprincipals/{id}/owners/{id}": {
     "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PATCH": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedPersonal": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    },
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PATCH": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/extensionproperties": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedPersonal": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/extensionproperties/{id}": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.Read.All",
-          "Application.ReadWrite.OwnedBy"
-        ]
-      },
-      "DelegatedPersonal": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    },
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals": {
-    "GET": {
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "Application.Read.All"
-        ],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      },
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages": {
-    "GET": {
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    }
-  },
-  "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages/{id}": {
-    "GET": {
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.Read.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/jobs/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/addkey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/addpassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/removekey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/removepassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/addkey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/addpassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/removekey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/removepassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/acquireaccesstoken": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applicationtemplates/{id}/instantiate": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/directory/deleteditems/{id}/restore": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/addkey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/addpassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/addtokensigningcertificate": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/claimsmappingpolicies": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/getpasswordsinglesignoncredentials": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/homerealmdiscoverypolicies": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/owners": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/removekey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/removepassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/addkey": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/addpassword": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/addtokensigningcertificate": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/getpasswordsinglesignoncredentials": {
-    "POST": {
       "Application": {
         "leastPrivilegePermissions": [
           "Application.ReadWrite.OwnedBy"
@@ -1269,6 +1734,50 @@
       }
     }
   },
+  "/serviceprincipals/{id}/synchronization/jobs": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/synchronization/jobs/{id}": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/serviceprincipals/{id}/synchronization/jobs/{id}/pause": {
     "POST": {
       "Application": {
@@ -1305,8 +1814,64 @@
       }
     }
   },
+  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema": {
+    "DELETE": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    },
+    "PUT": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
   "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/directories/{id}/discover": {
     "POST": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/filteroperators": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ],
+        "allPermissions": [
+          "Application.ReadWrite.OwnedBy"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/functions": {
+    "GET": {
       "Application": {
         "leastPrivilegePermissions": [
           "Application.ReadWrite.OwnedBy"
@@ -1353,68 +1918,8 @@
       }
     }
   },
-  "/serviceprincipals/{id}/synchronization/templates/{id}/schema/parseexpression": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/templates": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/templates/{id}/schema/filteroperators": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/templates/{id}/schema/functions": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/filteroperators": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/functions": {
-    "GET": {
+  "/serviceprincipals/{id}/synchronization/secrets": {
+    "PUT": {
       "Application": {
         "leastPrivilegePermissions": [
           "Application.ReadWrite.OwnedBy"
@@ -1485,314 +1990,12 @@
       }
     }
   },
-  "/applications(appid={value})/tokenissuancepolicies": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/tokenissuancepolicies": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/claimsmappingpolicies": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/homerealmdiscoverypolicies": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/jobs": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
+  "/serviceprincipals/{id}/synchronization/templates/{id}/schema/parseexpression": {
     "POST": {
       "Application": {
         "leastPrivilegePermissions": [
           "Application.ReadWrite.OwnedBy"
         ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/federatedidentitycredentials/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PATCH": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/federatedidentitycredentials/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PATCH": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/owners/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/owners/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/tokenissuancepolicies/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/claimsmappingpolicies/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/homerealmdiscoverypolicies/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/claimsmappingpolicies/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/homerealmdiscoverypolicies/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/owners/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications(appid={value})/tokenlifetimepolicies": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/tokenlifetimepolicies": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/tokenlifetimepolicies": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
         "allPermissions": [
           "Application.ReadWrite.OwnedBy"
         ]
@@ -1825,236 +2028,77 @@
       }
     }
   },
-  "/applications(appid={value})/logo": {
-    "PUT": {
+  "/serviceprincipals/{id}/transitivememberof": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/serviceprincipals/delta": {
+    "GET": {
+      "Application": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All",
+          "Application.ReadWrite.OwnedBy"
+        ]
+      },
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [
+          "Application.Read.All"
+        ],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages": {
+    "GET": {
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages/{id}": {
+    "GET": {
+      "DelegatedWork": {
+        "leastPrivilegePermissions": [],
+        "allPermissions": [
+          "Application.Read.All"
+        ]
+      }
+    }
+  },
+  "/users/{id}/approleassignedresources": {
+    "GET": {
       "Application": {
         "leastPrivilegePermissions": [],
         "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
+          "AppRoleAssignment.ReadWrite.All"
         ]
-      }
-    }
-  },
-  "/applications/{id}/logo": {
-    "PUT": {
-      "Application": {
+      },
+      "DelegatedWork": {
         "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/secrets": {
-    "PUT": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/templates/{id}/schema": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PUT": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/synchronization/jobs/{id}/schema": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PUT": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/applications/{id}/synchronization/templates/{id}": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    },
-    "PATCH": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ],
-        "allPermissions": [
-          "Application.ReadWrite.OwnedBy"
-        ]
-      }
-    }
-  },
-  "/groups/{id}/approleassignments/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/approleassignedto/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals/{id}/approleassignments/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/users/{id}/approleassignments/{id}": {
-    "DELETE": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/groups/{id}/approleassignments": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    },
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ],
         "allPermissions": [
           "AppRoleAssignment.ReadWrite.All"
         ]
@@ -2099,64 +2143,20 @@
       }
     }
   },
-  "/me/approleassignedresources": {
-    "GET": {
+  "/users/{id}/approleassignments/{id}": {
+    "DELETE": {
       "Application": {
-        "leastPrivilegePermissions": [],
+        "leastPrivilegePermissions": [
+          "AppRoleAssignment.ReadWrite.All"
+        ],
         "allPermissions": [
           "AppRoleAssignment.ReadWrite.All"
         ]
       },
       "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
+        "leastPrivilegePermissions": [
           "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/users/{id}/approleassignedresources": {
-    "GET": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/approleassignedto": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      }
-    }
-  },
-  "/serviceprincipals(appid={value})/approleassignments": {
-    "POST": {
-      "Application": {
-        "leastPrivilegePermissions": [],
-        "allPermissions": [
-          "AppRoleAssignment.ReadWrite.All"
-        ]
-      },
-      "DelegatedWork": {
-        "leastPrivilegePermissions": [],
+        ],
         "allPermissions": [
           "AppRoleAssignment.ReadWrite.All"
         ]
