@@ -11,9 +11,6 @@ using PermissionsScraper.Common;
 using PermissionsScraper.Models;
 using PermissionsScraper.Services;
 using System;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
 using GitHubRepoAppConfig = GitHubContentUtility.Common.ApplicationConfig;
 using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
 
@@ -25,7 +22,7 @@ namespace PermissionsScraper.Triggers
         private const string ReverseLookupTable = "ReverseLookupTable";
 
         [FunctionName("PermissionsReverseLookupTableGenerator")]
-        public static void Run([TimerTrigger("%ScheduleTriggerTime%")] TimerInfo myTimer, ILogger logger)
+        public static void Run([TimerTrigger("%ScheduleTriggerTime:ReverseLookupTable%")] TimerInfo myTimer, ILogger logger)
         {
             logger.LogInformation($"{DateTime.UtcNow}: PermissionsReverseLookupTableGenerator function started.");
             try
