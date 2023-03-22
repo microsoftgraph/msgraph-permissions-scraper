@@ -5,7 +5,6 @@
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using PermissionsScraper.Common;
-using PermissionsScraper.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
