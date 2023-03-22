@@ -22,7 +22,7 @@ namespace PermissionsScraper.Triggers
         private const string ReverseLookupTable = "ReverseLookupTable";
 
         [FunctionName("PermissionsReverseLookupTableGenerator")]
-        public static void Run([TimerTrigger("%ScheduleTriggerTime:ReverseLookupTable%")] TimerInfo myTimer, ILogger logger)
+        public static void Run([TimerTrigger("%ScheduleTriggerTime_ReverseLookupTable%")] TimerInfo myTimer, ILogger logger)
         {
             logger.LogInformation($"{DateTime.UtcNow}: PermissionsReverseLookupTableGenerator function started.");
             try

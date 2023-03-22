@@ -34,7 +34,7 @@ namespace PermissionsScraper.Triggers
         /// <param name="myTimer">Trigger function execution according to the specified cron time.</param>
         /// <param name="logger">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("%ScheduleTriggerTime:PermissionsDescriptions%")] TimerInfo myTimer, ILogger logger)
+        public static void Run([TimerTrigger("%ScheduleTriggerTime_PermissionsDescriptions%")] TimerInfo myTimer, ILogger logger)
         {
             logger.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
 
