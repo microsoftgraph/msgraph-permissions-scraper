@@ -18,11 +18,11 @@ namespace PermissionsScraper.Services
         /// <param name="openApiPathsDict">The dictionary of OpenAPI document paths and methods.</param>
         /// <param name="permissionsPathDict">The dictionary of permissions file paths and methods.</param>
         /// <returns>A list of string value of paths.</returns>
-        public string GetPathsInPermissionsFileNotInOpenAPIDocument(Dictionary<string, List<string>> openApiPathsDict, Dictionary<string, List<string>> permissionsPathDict)
+        public string GetPathsInPermissionsFileNotInOpenAPIDocument(Dictionary<string, List<string>> openApiPathsDict, Dictionary<string, List<string>> permissionsPathDict, string version = null)
         {
-            
+            var prefix = version == null ? null : $" - {version}";
             var strBuilder = new StringBuilder();
-            strBuilder.AppendLine("Paths and operations in the Permissions file not present in the OpenAPI document");
+            strBuilder.AppendLine("Paths and operations in the Permissions file not present in the OpenAPI document" + prefix);
             strBuilder.AppendLine("--------------------------------------------------------------------------------");
             var totalPaths = 0;
 
@@ -89,10 +89,11 @@ namespace PermissionsScraper.Services
         /// <param name="openApiPathsDict">The dictionary of OpenAPI document paths and methods</param>
         /// <param name="permissionsPathDict">The dictionary of permissions file paths and methods.</param>
         /// <returns>A list of string value of paths that a</returns>
-        public string GetPathsInOpenAPIDocumentNotInPermissionsFile(Dictionary<string, List<string>> openApiPathsDict, Dictionary<string, List<string>> permissionsPathDict)
+        public string GetPathsInOpenAPIDocumentNotInPermissionsFile(Dictionary<string, List<string>> openApiPathsDict, Dictionary<string, List<string>> permissionsPathDict, string version = null)
         {
+            var prefix = version == null ? null : $" - {version}";
             var strBuilder = new StringBuilder();
-            strBuilder.AppendLine("Paths and operations in the OpenAPI document not present in the permissions file");
+            strBuilder.AppendLine("Paths and operations in the OpenAPI document not present in the permissions file" + prefix);
             strBuilder.AppendLine("--------------------------------------------------------------------------------");
             var totalPaths = 0;
 

@@ -89,13 +89,24 @@ public class OpenApiPathsService
 
 
     /// <summary>
-    /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url. 
+    /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url async. 
     /// </summary>
     /// <param name="fileUrl">The url of the permissions file.</param>
     /// <returns>A serialized dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
     public async Task<string> GetSerializedPathsDictionaryFromOpenApiFileUrlAsync(string fileUrl)
     {
         var pathsDictionary = await RetrievePathsFromOpenApiDocument(fileUrl);
+        return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
+    }
+
+    /// <summary>
+    /// Gets a serialized dictionary of paths and http methods extracted from a file at the given url. 
+    /// </summary>
+    /// <param name="fileUrl">The url of the permissions file.</param>
+    /// <returns>A serialized dictionary of paths and http methods extracted from the permissions file located at the provided <paramref name="fileUrl"/>.</returns>
+    public string GetSerializedPathsDictionaryFromOpenApiFileUrl(string fileUrl)
+    {
+        var pathsDictionary = RetrievePathsFromOpenApiDocument(fileUrl).GetAwaiter().GetResult();
         return JsonConvert.SerializeObject(pathsDictionary, Formatting.Indented);
     }
 

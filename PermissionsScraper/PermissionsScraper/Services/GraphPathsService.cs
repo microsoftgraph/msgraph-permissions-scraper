@@ -3,6 +3,7 @@ using PermissionsAppConfig = PermissionsScraper.Common.ApplicationConfig;
 using PermissionsScraper.Common;
 using System;
 using Newtonsoft.Json;
+using Microsoft.OpenApi.Models;
 
 namespace PermissionsScraper.Services
 {
@@ -16,132 +17,120 @@ namespace PermissionsScraper.Services
         private Dictionary<string, List<string>> _prodOpenApiPathsDict_Beta;
         private Dictionary<string, List<string>> _prodPermissionsPathDict_V1;
         private Dictionary<string, List<string>> _prodPermissionsPathDict_Beta;
-        private Dictionary<string, List<string>> _simpOpenApiPathsDict_V1;
-        private Dictionary<string, List<string>> _simpOpenApiPathsDict_Beta;
-        private Dictionary<string, List<string>> _simpPermissionsPathDict_V1;
-        private Dictionary<string, List<string>> _simpPermissionsPathDict_Beta;
+        
+        private string _simpOpenApiPathsDict_V1;
+        private string _simpOpenApiPathsDict_Beta;
+        private string _simpPermissionsPathDict_V1;
+        private string _simpPermissionsPathDict_Beta;
 
-        #region Production Paths Dictionaries
-        public Dictionary<string, List<string>> ProdOpenApiPathsDict_V1
-        {
-            get => _prodOpenApiPathsDict_V1;
-            set => _prodOpenApiPathsDict_V1 = GetOpenApiPathsDictionary(Constants.V1,
-                _permissionsAppConfig.ProductionOpenApiFilePaths[Constants.V1]);
-        }
+        private string _permissionsFileContent_V1;
+        private string _permissionsFileContent_Beta;
+        private string _openApiFileContent_V1;
+        private string _openApiFileContent_Beta;
 
-        public Dictionary<string, List<string>> ProdOpenApiPathsDict_Beta
-        {
-            get => _prodOpenApiPathsDict_Beta;
-            set => _prodOpenApiPathsDict_Beta = GetOpenApiPathsDictionary(Constants.Beta,
-                _permissionsAppConfig.ProductionOpenApiFilePaths[Constants.Beta]);
-        }
+        private string _missingPathsInOpenApi_V1;
+        private string _missingPathsInOpenApi_Beta;
+        private string _missingPathsInPermissions_V1;
+        private string _missingPathsInPermissions_Beta;
 
-        public Dictionary<string, List<string>> ProdPermissionsPathDict_V1
-        {
-            get => _prodPermissionsPathDict_V1;
-            set => _prodPermissionsPathDict_V1 = GetPermissionsPathsDictionary(Constants.V1,
-                _permissionsAppConfig.ProductionPermissionsFilePaths[Constants.V1]);
-        }
-
-        public Dictionary<string, List<string>> ProdPermissionsPathDict_Beta
-        {
-            get => _prodPermissionsPathDict_Beta;
-            set => _prodPermissionsPathDict_Beta = GetPermissionsPathsDictionary(Constants.Beta,
-                _permissionsAppConfig.ProductionPermissionsFilePaths[Constants.Beta]);
-        }
-
-        #endregion
-
-        #region Simplified Paths Dictionaries
-        public Dictionary<string, List<string>> SimpOpenApiPathsDict_V1
-        {
-            get => _simpOpenApiPathsDict_V1;
-            set => _simpOpenApiPathsDict_V1 = GetOpenApiPathsDictionary(Constants.V1,
-                _permissionsAppConfig.SimplifiedOpenApiFilePaths[Constants.V1]);
-        }
-
-        public Dictionary<string, List<string>> SimpOpenApiPathsDict_Beta
-        {
-            get => _simpOpenApiPathsDict_Beta;
-            set => _simpOpenApiPathsDict_Beta = GetOpenApiPathsDictionary(Constants.Beta,
-                _permissionsAppConfig.SimplifiedOpenApiFilePaths[Constants.Beta]);
-        }
-
-        public Dictionary<string, List<string>> SimpPermissionsPathDict_V1
-        {
-            get => _simpPermissionsPathDict_V1;
-            set => _simpPermissionsPathDict_V1 = GetPermissionsPathsDictionary(Constants.V1,
-                _permissionsAppConfig.SimplifiedPermissionsFilePaths[Constants.V1]);
-        }
-
-        public Dictionary<string, List<string>> SimpPermissionsPathDict_Beta
-        {
-            get => _simpPermissionsPathDict_Beta;
-            set => _simpPermissionsPathDict_Beta = GetPermissionsPathsDictionary(Constants.Beta,
-                _permissionsAppConfig.SimplifiedPermissionsFilePaths[Constants.Beta]);
-        }
-
-        #endregion
 
         public GraphPathsService (PermissionsAppConfig permissionsAppConfig)
         {
             _permissionsAppConfig = permissionsAppConfig;
         }
-        
-        public Dictionary<string, List<string>> GetOpenApiPathsDictionary(string version, string url)
+
+        private async void FetchSourceFiles()
         {
-            if (version.Equals(Constants.V1, StringComparison.OrdinalIgnoreCase))
-            {
-                var openApiDoc_V1 = _openApiPathsService.FetchOpenApiDocument(url).GetAwaiter().GetResult();
-                return _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiDoc_V1);
-            }
-            else if (version.Equals(Constants.Beta, StringComparison.OrdinalIgnoreCase))
-            {
-                var openApiDoc_Beta = _openApiPathsService.FetchOpenApiDocument(url).GetAwaiter().GetResult();
-                return _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiDoc_Beta);
-            }
-            
-            return null;
+            #region Production Paths Dictionaries
+
+            // Retrieve the OpenAPI and permissions files from production sources
+            _prodOpenApiPathsDict_V1 ??= GetOpenApiPathsDictionary(_permissionsAppConfig.GraphOpenApiFilePaths[Constants.V1]);
+
+            _prodOpenApiPathsDict_Beta ??= GetOpenApiPathsDictionary(_permissionsAppConfig.GraphOpenApiFilePaths[Constants.Beta]);
+
+            _prodPermissionsPathDict_V1 ??= GetPermissionsPathsDictionary(_permissionsAppConfig.GraphPermissionsFilePaths[Constants.V1]);
+
+            _prodPermissionsPathDict_Beta ??= GetPermissionsPathsDictionary(_permissionsAppConfig.GraphPermissionsFilePaths[Constants.Beta]);
+
+            #endregion
+
+            //#region Simplified Paths Dictionaries
+
+            // Retrieve the simplified OpenAPI and permissions files from the Github repo.
+            //_simpOpenApiPathsDict_V1 ??= _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrl(_permissionsAppConfig.GraphOpenApiFilePaths[Constants.SimplifiedV1_0]);
+
+            //_simpOpenApiPathsDict_Beta ??= _openApiPathsService.GetSerializedPathsDictionaryFromOpenApiFileUrl(_permissionsAppConfig.GraphOpenApiFilePaths[Constants.SimplifiedBeta]);
+
+            //_simpPermissionsPathDict_V1 ??= _permissionsFilePathsService.GetSerializedPathsDictionaryFromPermissionsFileUrl(_permissionsAppConfig.GraphPermissionsFilePaths[Constants.SimplifiedV1_0]);
+
+            //_simpPermissionsPathDict_Beta ??= _permissionsFilePathsService.GetSerializedPathsDictionaryFromPermissionsFileUrl(_permissionsAppConfig.GraphPermissionsFilePaths[Constants.SimplifiedBeta]);
+
+            //#endregion
         }
 
-        public Dictionary<string, List<string>> GetPermissionsPathsDictionary(string version, string url)
+        public Dictionary<string, List<string>> GetOpenApiPathsDictionary(string url)
         {
-            if (version.Equals(Constants.V1, StringComparison.OrdinalIgnoreCase))
-            {
-                return _permissionsFilePathsService.GetPathsDictionaryFromPermissionsFileUrlAsync(url).GetAwaiter().GetResult();
-            }
-            else if (version.Equals(Constants.Beta, StringComparison.OrdinalIgnoreCase))
-            {
-                return _permissionsFilePathsService.GetPathsDictionaryFromPermissionsFileUrlAsync(url).GetAwaiter().GetResult();
-            }
+            var openApiDoc = _openApiPathsService.FetchOpenApiDocument(url).GetAwaiter().GetResult();
+            return _openApiPathsService.RetrievePathsFromOpenApiDocument(openApiDoc);
+        }
 
-            return null;
+        public Dictionary<string, List<string>> GetPermissionsPathsDictionary(string url)
+        {
+            return _permissionsFilePathsService.GetPathsDictionaryFromPermissionsFileUrlAsync(url).GetAwaiter().GetResult();
+        }
+
+        private void RetrievePermissionsAndOpenAPIFileContents()
+        {
+            FetchSourceFiles();
+            
+            // Permissions and OpenAPI file contents
+            _permissionsFileContent_V1 = JsonConvert.SerializeObject(_prodPermissionsPathDict_V1, Formatting.Indented);
+            _permissionsFileContent_Beta = JsonConvert.SerializeObject(_prodPermissionsPathDict_Beta, Formatting.Indented);
+            _openApiFileContent_V1 = JsonConvert.SerializeObject(_prodOpenApiPathsDict_V1, Formatting.Indented);
+            _openApiFileContent_Beta = JsonConvert.SerializeObject(_prodOpenApiPathsDict_Beta, Formatting.Indented);
+        }
+        
+        private void RetrieveMissingPathsFileContents()
+        {
+            FetchSourceFiles();
+            
+            // Missing paths in OpenAPI and permissions files for both v1 and beta
+            _missingPathsInOpenApi_V1 = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(_prodOpenApiPathsDict_V1, _prodPermissionsPathDict_V1, Constants.V1);
+            _missingPathsInOpenApi_Beta = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(_prodOpenApiPathsDict_Beta, _prodPermissionsPathDict_Beta, Constants.Beta);
+            _missingPathsInPermissions_V1 = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(_prodOpenApiPathsDict_V1, _prodPermissionsPathDict_V1, Constants.V1);
+            _missingPathsInPermissions_Beta = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(_prodOpenApiPathsDict_Beta, _prodPermissionsPathDict_Beta, Constants.Beta);
+
         }
 
         public Dictionary<string, string> GetGraphPathsFileContents(Dictionary<string, string> fileContents)
-        {            
-            // Permissions and OpenAPI file contents
-            var permissionsFileContent_V1 = JsonConvert.SerializeObject(ProdPermissionsPathDict_V1, Formatting.Indented);
-            var permissionsFileContent_Beta = JsonConvert.SerializeObject(ProdPermissionsPathDict_Beta, Formatting.Indented);
-            var openApiFileContent_V1 = JsonConvert.SerializeObject(ProdOpenApiPathsDict_V1, Formatting.Indented);
-            var openApiFileContent_Beta = JsonConvert.SerializeObject(ProdOpenApiPathsDict_Beta, Formatting.Indented);
+        {
+            //FetchSourceFiles();
 
-            // Missing paths in OpenAPI and permissions files for both v1 and beta
-            var missingPathsInOpenApi_V1 = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(ProdOpenApiPathsDict_V1, ProdPermissionsPathDict_V1);
-            var missingPathsInOpenApi_Beta = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(ProdOpenApiPathsDict_Beta, ProdPermissionsPathDict_Beta);
-            var missingPathsInPermissions_V1 = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(ProdOpenApiPathsDict_V1, ProdPermissionsPathDict_V1);
-            var missingPathsInPermissions_Beta = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(ProdOpenApiPathsDict_Beta, ProdPermissionsPathDict_Beta);
+            //// Permissions and OpenAPI file contents
+            //var permissionsFileContent_V1 = JsonConvert.SerializeObject(_prodPermissionsPathDict_V1, Formatting.Indented);
+            //var permissionsFileContent_Beta = JsonConvert.SerializeObject(_prodPermissionsPathDict_Beta, Formatting.Indented);
+            //var openApiFileContent_V1 = JsonConvert.SerializeObject(_prodOpenApiPathsDict_V1, Formatting.Indented);
+            //var openApiFileContent_Beta = JsonConvert.SerializeObject(_prodOpenApiPathsDict_Beta, Formatting.Indented);
 
+            //// Missing paths in OpenAPI and permissions files for both v1 and beta
+            //var missingPathsInOpenApi_V1 = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(_prodOpenApiPathsDict_V1, _prodPermissionsPathDict_V1, Constants.V1);
+            //var missingPathsInOpenApi_Beta = _pathsComparerService.GetPathsInPermissionsFileNotInOpenAPIDocument(_prodOpenApiPathsDict_Beta, _prodPermissionsPathDict_Beta, Constants.Beta);
+            //var missingPathsInPermissions_V1 = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(_prodOpenApiPathsDict_V1, _prodPermissionsPathDict_V1, Constants.V1);
+            //var missingPathsInPermissions_Beta = _pathsComparerService.GetPathsInOpenAPIDocumentNotInPermissionsFile(_prodOpenApiPathsDict_Beta, _prodPermissionsPathDict_Beta, Constants.Beta);
+            
+            RetrievePermissionsAndOpenAPIFileContents();
+            RetrieveMissingPathsFileContents();
+            
             var contentDictionary = new Dictionary<string, string>
                 {
-                    { Constants.OpenApiPathsV1 , openApiFileContent_V1 },
-                    { Constants.OpenApiPathsBeta, openApiFileContent_Beta },
-                    { Constants.PermissionsPathsV1, permissionsFileContent_V1 },
-                    { Constants.PermissionsPathsBeta, permissionsFileContent_Beta },
-                    { Constants.MissingPathsInOpenApiDocumentV1, missingPathsInOpenApi_V1 },
-                    { Constants.MissingPathsInOpenApiDocumentBeta, missingPathsInOpenApi_Beta },
-                    { Constants.MissingPathsInPermissionsFileV1, missingPathsInPermissions_V1 },
-                    { Constants.MissingPathsInPermissionsFileBeta, missingPathsInPermissions_Beta }
+                    { Constants.OpenApiPathsV1, _openApiFileContent_V1 },
+                    { Constants.OpenApiPathsBeta, _openApiFileContent_Beta },
+                    { Constants.PermissionsPathsV1, _permissionsFileContent_V1 },
+                    { Constants.PermissionsPathsBeta, _permissionsFileContent_Beta },
+                    { Constants.MissingPathsInOpenApiDocumentV1, _missingPathsInOpenApi_V1 },
+                    { Constants.MissingPathsInOpenApiDocumentBeta, _missingPathsInOpenApi_Beta },
+                    { Constants.MissingPathsInPermissionsFileV1, _missingPathsInPermissions_V1 },
+                    { Constants.MissingPathsInPermissionsFileBeta, _missingPathsInPermissions_Beta }
                 };
 
             foreach (var item in contentDictionary)
@@ -152,15 +141,19 @@ namespace PermissionsScraper.Services
             return fileContents;
         }
 
-        public bool ShouldGraphPathFilesBeUpdated() => 
-                !JsonConvert.SerializeObject(ProdPermissionsPathDict_V1, Formatting.Indented)
-                .Equals(JsonConvert.SerializeObject(SimpPermissionsPathDict_V1, Formatting.Indented)) ||
-                !JsonConvert.SerializeObject(ProdPermissionsPathDict_Beta, Formatting.Indented)
-                .Equals(JsonConvert.SerializeObject(SimpPermissionsPathDict_Beta, Formatting.Indented)) ||
-                !JsonConvert.SerializeObject(ProdOpenApiPathsDict_V1, Formatting.Indented)
-                .Equals(JsonConvert.SerializeObject(SimpOpenApiPathsDict_V1, Formatting.Indented)) ||
-                !JsonConvert.SerializeObject(ProdOpenApiPathsDict_Beta, Formatting.Indented)
-                .Equals(JsonConvert.SerializeObject(SimpOpenApiPathsDict_Beta, Formatting.Indented));
-
+        public bool ShouldGraphPathFilesBeUpdated() 
+        {
+            FetchSourceFiles();
+            
+            return 
+                !JsonConvert.SerializeObject(_prodPermissionsPathDict_V1, Formatting.Indented)
+                .Equals(_simpPermissionsPathDict_V1) ||
+                !JsonConvert.SerializeObject(_prodPermissionsPathDict_Beta, Formatting.Indented)
+                .Equals(_simpPermissionsPathDict_Beta) ||
+                !JsonConvert.SerializeObject(_prodOpenApiPathsDict_V1, Formatting.Indented)
+                .Equals(_simpOpenApiPathsDict_V1) ||
+                !JsonConvert.SerializeObject(_prodOpenApiPathsDict_Beta, Formatting.Indented)
+                .Equals(_simpOpenApiPathsDict_Beta);
+        }
     }
 }

@@ -25,8 +25,9 @@ namespace PermissionsScraper.Triggers
 
                 var resourceType = Constants.GraphPathsFiles;
                 var gitHubAppConfig = GithubConfigurationProvider.SetGitHubConfiguration(permissionsAppConfig, resourceType);
-
-                gitHubAppConfig.FileContents = GraphPathsService.GetGraphPathsFileContent(permissionsAppConfig, gitHubAppConfig.FileContents);
+                GraphPathsService graphPathsService = new GraphPathsService(permissionsAppConfig);
+                
+                gitHubAppConfig.FileContents = graphPathsService.GetGraphPathsFileContents(gitHubAppConfig.FileContents);
 
                 log.LogInformation($"Writing updated Graph paths files into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");

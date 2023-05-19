@@ -18,5 +18,7 @@ namespace PermissionsScraper.Common
         public static string V1 = "v1.0";
         public static string Beta = "beta";
         public static string GraphPathsFiles = "GraphPathsFiles";
+        public static string SimplifiedV1_0 = "simplified_v1.0";
+        public static string SimplifiedBeta = "simplified_beta";
     }
 }

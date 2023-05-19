@@ -63,7 +63,7 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// Graph paths from Permissions file in production 
         /// </summary>
-        public Dictionary<string, string> ProductionPermissionsFilePaths { get; set; }
+        public Dictionary<string, string> GraphPermissionsFilePaths { get; set; }
 
         /// <summary>
         /// Graph paths from the simplified Permissions file
@@ -73,7 +73,7 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// Graph paths from OpenApi file in production 
         /// </summary>
-        public Dictionary<string, string> ProductionOpenApiFilePaths { get; set; }
+        public Dictionary<string, string> GraphOpenApiFilePaths { get; set; }
 
         /// <summary>
         /// Graph paths from the simplified OpenAPI file
