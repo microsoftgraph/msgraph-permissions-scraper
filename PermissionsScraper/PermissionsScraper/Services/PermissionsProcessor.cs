@@ -9,6 +9,7 @@ using PermissionsScraper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Octokit;
 
 namespace PermissionsScraper.Services
 {
@@ -207,7 +208,8 @@ namespace PermissionsScraper.Services
             PermissionsDocument permissionsDocument)
         {
             UtilityFunctions.CheckArgumentNull(permissionsDocument, nameof(permissionsDocument));
-
+        
+            var allLeastPrivilegePermissions = new Dictionary<string, Dictionary<string, Dictionary<string, HashSet<string>>>>(); // path => scheme => methods => permission
             var reverseLookupTable = new Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>>();
             foreach (var permission in permissionsDocument.Permissions)
             {
@@ -244,14 +246,62 @@ namespace PermissionsScraper.Services
                                 schemePermissions.AllPermissions.Add(permission.Key);
                                 if (leastPrivilegeSchemes.Contains(schemeKey))
                                 {
-                                    schemePermissions.LeastPrivilegePermissions.Add(permission.Key);
+                                    if (!allLeastPrivilegePermissions.TryGetValue(path.Key, out var schemesLeastPrivilegePermissions))
+                                    {
+                                        schemesLeastPrivilegePermissions = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+                                        allLeastPrivilegePermissions.Add(path.Key, schemesLeastPrivilegePermissions);
+                                    }
+
+                                   if(!schemesLeastPrivilegePermissions.TryGetValue(schemeKey, out var methodLeastPrivilegePermissions))
+                                   {
+                                        methodLeastPrivilegePermissions = new Dictionary<string, HashSet<string>>();
+                                        schemesLeastPrivilegePermissions.Add(schemeKey, methodLeastPrivilegePermissions);
+                                   }
+
+                                   var combinedMethods = string.Join(",", pathSet.Methods);
+                                   if (!methodLeastPrivilegePermissions.TryGetValue(combinedMethods, out var leastPrivilegePermissions))
+                                   {
+                                        leastPrivilegePermissions = new HashSet<string>();
+                                        methodLeastPrivilegePermissions.Add(combinedMethods, leastPrivilegePermissions);
+                                   }
+                                   leastPrivilegePermissions.Add(permission.Key);
                                 }
                             }
                         }
                     }
                 }
             }
+            PopulateLeastPrivilegePermissions(ref reverseLookupTable, allLeastPrivilegePermissions);
             return reverseLookupTable.OrderBy(x => x.Key).ToDictionary(k => k.Key, v => v.Value);
+        }
+
+        public static void PopulateLeastPrivilegePermissions(
+            ref Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>> reverseLookupTable,
+            Dictionary<string, Dictionary<string, Dictionary<string, HashSet<string>>>> allLeastPrivilegePermissions)
+        {
+            foreach (var pathLeastPrivilegePermissions in allLeastPrivilegePermissions)
+            {
+                var path = pathLeastPrivilegePermissions.Key;
+                foreach (var schemeLeastPrivilegePermissions in pathLeastPrivilegePermissions.Value)
+                {
+                    var schemeKey = schemeLeastPrivilegePermissions.Key;
+                    var coveredMethods = new HashSet<string>();
+                    foreach (var methodLeastPrivilegePermissions in schemeLeastPrivilegePermissions.Value.OrderBy(x => x.Key.Length))
+                    {
+                        var supportedMethods = methodLeastPrivilegePermissions.Key.Split(",").ToList();
+                        supportedMethods = supportedMethods.Except(coveredMethods).ToList();
+                        foreach (var method in supportedMethods)
+                        {
+                            foreach (var permission in methodLeastPrivilegePermissions.Value)
+                            {
+                                reverseLookupTable[path][method][schemeKey].LeastPrivilegePermissions.Add(permission);
+
+                            }
+                            coveredMethods.Add(method);
+                        }
+                    }
+                }
+            }
         }
     }
 }
