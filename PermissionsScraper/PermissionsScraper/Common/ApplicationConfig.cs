@@ -110,7 +110,7 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// The remote branch where commits are made into
         /// </summary>
-        public Dictionary<string, string> WorkingBranches { get; set; }
+        public string WorkingBranch { get; set; }
 
         /// <summary>
         /// The remote branch which is the base reference of the <see cref="WorkingBranch"/>
@@ -118,24 +118,34 @@ namespace PermissionsScraper.Common
         public string ReferenceBranch { get; set; }
 
         /// <summary>
-        /// The file path of a file content in a repository branch
+        /// The file path of the descriptions file content in a repository branch
         /// </summary>
-        public Dictionary<string, string> FileContentPaths { get; set; }
+        public string DescriptionsFileContentPath { get; set; }
+
+        /// <summary>
+        /// The file path of the permissions file content in a repository branch
+        /// </summary>
+        public string PermissionsFileContentPath { get; set; }
+
+        /// <summary>
+        /// The string contents of a file in a respository branch
+        /// </summary>
+        public string FileContent { get; set; }
 
         /// <summary>
         /// The commit message
         /// </summary>
-        public Dictionary<string, string> CommitMessages { get; set; }
+        public string CommitMessage { get; set; }
 
         /// <summary>
         /// Pull request title
         /// </summary>
-        public Dictionary<string, string> PullRequestTitles { get; set; }
+        public string PullRequestTitle { get; set; }
 
         /// <summary>
         /// Pull request message
         /// </summary>
-        public Dictionary<string, string> PullRequestBodies { get; set; }
+        public string PullRequestBody { get; set; }
 
         /// <summary>
         /// List of pull request reviewers

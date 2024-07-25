@@ -22,8 +22,6 @@ namespace PermissionsScraper.Triggers
 {
     public static class DescriptionsScraper
     {
-        private const string PermissionsDocumentFile = "PermissionsDocumentFile";
-        private const string PermissionsDescriptions = "PermissionsDescriptions";
         private static Dictionary<string, List<Dictionary<string, object>>> _servicePrincipalPermissions;
         private static Dictionary<string, List<Dictionary<string, object>>> _updatedGithubPermissions;
 
@@ -34,7 +32,7 @@ namespace PermissionsScraper.Triggers
         /// <param name="myTimer">Trigger function execution according to the specified cron time.</param>
         /// <param name="logger">Logger object used to log information, errors or warnings.</param>
         [FunctionName("DescriptionsScraper")]
-        public static void Run([TimerTrigger("%ScheduleTriggerTime_PermissionsDescriptions%")] TimerInfo myTimer, ILogger logger)
+        public static void Run([TimerTrigger("%ScheduleTriggerTime%")] TimerInfo myTimer, ILogger logger)
         {
             logger.LogInformation($"DescriptionsScraper function started. Time: {DateTime.UtcNow}");
 
@@ -48,14 +46,14 @@ namespace PermissionsScraper.Triggers
                     GitHubAppName = permissionsAppConfig.GitHubAppName,
                     GitHubRepoName = permissionsAppConfig.GitHubRepoName,
                     ReferenceBranch = permissionsAppConfig.ReferenceBranch,
-                    FileContentPath = permissionsAppConfig.FileContentPaths[PermissionsDescriptions],
-                    WorkingBranch = permissionsAppConfig.WorkingBranches[PermissionsDescriptions],
+                    FileContentPath = permissionsAppConfig.DescriptionsFileContentPath,
+                    WorkingBranch = permissionsAppConfig.WorkingBranch,
                     Reviewers = permissionsAppConfig.Reviewers,
-                    PullRequestTitle = permissionsAppConfig.PullRequestTitles[PermissionsDescriptions],
-                    PullRequestBody = permissionsAppConfig.PullRequestBodies[PermissionsDescriptions],
+                    PullRequestTitle = permissionsAppConfig.PullRequestTitle,
+                    PullRequestBody = permissionsAppConfig.PullRequestBody,
                     PullRequestLabels = permissionsAppConfig.PullRequestLabels,
                     PullRequestAssignees = permissionsAppConfig.PullRequestAssignees,
-                    CommitMessage = permissionsAppConfig.CommitMessages[PermissionsDescriptions],
+                    CommitMessage = permissionsAppConfig.CommitMessage,
                     TreeItemMode = Enums.TreeItemMode.Blob
                 };
 
@@ -125,7 +123,7 @@ namespace PermissionsScraper.Triggers
                 }
                 else // use descriptions from workloads permissions file
                 {
-                    gitHubAppConfig.FileContentPath = permissionsAppConfig.FileContentPaths[PermissionsDocumentFile];
+                    gitHubAppConfig.FileContentPath = permissionsAppConfig.PermissionsFileContentPath;
                     var permissionsDocumentText = BlobContentReader.ReadRepositoryBlobContentAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                     if (string.IsNullOrEmpty(permissionsDocumentText))
@@ -148,11 +146,11 @@ namespace PermissionsScraper.Triggers
                     gitHubAppConfig.FileContent = newPermissionsDescriptionsText;
                 }
 
-                gitHubAppConfig.FileContentPath = permissionsAppConfig.FileContentPaths[PermissionsDescriptions];
-
                 logger.LogInformation($"Writing updated permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
                     $"branch '{gitHubAppConfig.WorkingBranch}'. Time: {DateTime.UtcNow}");
 
+
+                gitHubAppConfig.FileContentPath = permissionsAppConfig.DescriptionsFileContentPath;
                 BlobContentWriter.WriteToRepositoryAsync(gitHubAppConfig, permissionsAppConfig.GitHubAppKey).GetAwaiter().GetResult();
 
                 logger.LogInformation($"Finished updating permissions descriptions into GitHub repository '{gitHubAppConfig.GitHubRepoName}', " +
