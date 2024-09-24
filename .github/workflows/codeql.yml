@@ -21,6 +21,11 @@ on:
   schedule:
     - cron: '1 * * * 1' # At minute 0 on Monday
 
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  
 jobs:
   analyze:
     name: Analyze
@@ -31,10 +36,6 @@ jobs:
     # Consider using larger runners for possible analysis time improvements.
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
     strategy:
       fail-fast: false
