@@ -71,7 +71,7 @@ namespace PermissionsScraper.Services
                     {
                         ScopeName = permission.Key,
                         AdminDisplayName = schemesDescriptions.Value.AdminDisplayName,
-                        AdminDescription= schemesDescriptions.Value.AdminDescription,
+                        AdminDescription = schemesDescriptions.Value.AdminDescription,
                         ConsentDisplayName = schemesDescriptions.Value.UserDisplayName,
                         ConsentDescription = schemesDescriptions.Value.UserDescription,
                         IsAdmin = schemesDescriptions.Value.RequiresAdminConsent,
@@ -196,62 +196,6 @@ namespace PermissionsScraper.Services
             }
 
             return permissionsUpdated;
-        }
-
-        /// <summary>
-        /// Creates permissions reverse lookup table from permissions document obtained from workloads repo.
-        /// </summary>
-        /// <param name="permissionsDocument">The <see cref="PermissionsDocument"/> input with permissions descriptions.</param>
-        /// <returns>Permissions reverse lookup table with the key as the request URL.</returns>
-        public static Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>> CreatePermissionsReverseLookupTable(
-            PermissionsDocument permissionsDocument)
-        {
-            UtilityFunctions.CheckArgumentNull(permissionsDocument, nameof(permissionsDocument));
-
-            var reverseLookupTable = new Dictionary<string, Dictionary<string, Dictionary<string, SchemePermissions>>>();
-            foreach (var permission in permissionsDocument.Permissions)
-            {
-                foreach (var pathSet in permission.Value.PathSets)
-                {
-                    foreach (var path in pathSet.Paths)
-                    {
-                        if (!reverseLookupTable.TryGetValue(path.Key, out var pathPermissions))
-                        {
-                            pathPermissions = new Dictionary<string, Dictionary<string, SchemePermissions>>();
-                            reverseLookupTable.Add(path.Key, pathPermissions);
-                        }
-
-                        var leastPrivilegeSchemes = !string.IsNullOrEmpty(path.Value) 
-                            ? path.Value.Split("=")[1].Split(',', StringSplitOptions.RemoveEmptyEntries) 
-                            : new string[0];
-
-                        foreach (var method in pathSet.Methods)
-                        {
-                            if (!pathPermissions.TryGetValue(method, out var supportedMethodPermissions))
-                            {
-                                supportedMethodPermissions = new Dictionary<string, SchemePermissions>();
-                                pathPermissions.Add(method, supportedMethodPermissions);
-                            }
-
-                            foreach (var schemeKey in pathSet.SchemeKeys)
-                            {
-                                if (!supportedMethodPermissions.TryGetValue(schemeKey, out var schemePermissions))
-                                {
-                                    schemePermissions = new SchemePermissions();
-                                    supportedMethodPermissions.Add(schemeKey, schemePermissions);
-                                }
-
-                                schemePermissions.AllPermissions.Add(permission.Key);
-                                if (leastPrivilegeSchemes.Contains(schemeKey))
-                                {
-                                    schemePermissions.LeastPrivilegePermissions.Add(permission.Key);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return reverseLookupTable.OrderBy(x => x.Key).ToDictionary(k => k.Key, v => v.Value);
         }
     }
 }
