@@ -1,0 +1,397 @@
+{
+  "$schema": "https://microsoftgraph.github.io/msgraph-metadata/graph-permissions-schema.json",
+  "permissions": {
+    "Application.Read.All": {
+      "schemes": {
+        "Application": {
+          "adminDisplayName": "Read all applications",
+          "adminDescription": "Allows the app to read all applications and service principals without a signed-in user.",
+          "requiresAdminConsent": false
+        },
+        "DelegatedPersonal": {
+          "adminDisplayName": "Read applications",
+          "adminDescription": "Allows the app to read applications and service principals on behalf of the signed-in user.",
+          "userDisplayName": "Read applications",
+          "userDescription": "Allows the app to read applications and service principals on your behalf.",
+          "requiresAdminConsent": true
+        },
+        "DelegatedWork": {
+          "adminDisplayName": "Read applications",
+          "adminDescription": "Allows the app to read applications and service principals on behalf of the signed-in user.",
+          "userDisplayName": "Read applications",
+          "userDescription": "Allows the app to read applications and service principals on your behalf.",
+          "requiresAdminConsent": true
+        }
+      },
+      "pathSets": [
+        {
+          "methods": [
+            "GET"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/applications(appid={value})/federatedidentitycredentials": "",
+            "/applications(appid={value})/owners": "",
+            "/applications/{id}/federatedidentitycredentials": "least=DelegatedWork,Application",
+            "/applications/{id}/owners": "least=DelegatedWork,Application",
+            "/applications/delta": "least=DelegatedWork,Application",
+            "/directory/deleteditems/{id}": "least=DelegatedWork,Application",
+            "/directory/deleteditems/microsoft.graph.administrativeunit": "",
+            "/directory/deleteditems/microsoft.graph.application": "least=DelegatedWork,Application",
+            "/directory/deleteditems/microsoft.graph.group": "least=DelegatedWork,Application",
+            "/directory/deleteditems/microsoft.graph.serviceprincipal": "least=DelegatedWork,Application",
+            "/directory/deleteditems/microsoft.graph.user": "least=DelegatedWork,Application",
+            "/policies/appmanagementpolicies/{id}/appliesto": "least=DelegatedWork,Application",
+            "/policies/claimsmappingpolicies/{id}/appliesto": "",
+            "/policies/homerealmdiscoverypolicies/{id}/appliesto": "",
+            "/policies/tokenissuancepolicies/{id}/appliesto": "",
+            "/policies/tokenlifetimepolicies/{id}/appliesto": "",
+            "/schemaextensions": "least=Application",
+            "/schemaextensions/{id}": "least=Application",
+            "/serviceprincipals(appid={value})": "",
+            "/serviceprincipals/{id}": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/approleassignedto": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/approleassignments": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/createdobjects": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/delegatedpermissionclassifications": "least=DelegatedWork",
+            "/serviceprincipals/{id}/memberof": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/ownedobjects": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/owners": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/transitivememberof": "least=DelegatedWork,Application",
+            "/serviceprincipals/delta": "least=DelegatedWork,Application"
+          }
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedPersonal",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/applications": "least=DelegatedWork,DelegatedPersonal,Application",
+            "/applications(appid={value})": "",
+            "/applications/{id}": "least=DelegatedWork,DelegatedPersonal,Application",
+            "/applications/{id}/extensionproperties": "least=DelegatedWork,DelegatedPersonal,Application",
+            "/applications/{id}/extensionproperties/{id}": "least=DelegatedWork,DelegatedPersonal,Application"
+          }
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "schemeKeys": [
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/serviceprincipals": "least=DelegatedWork",
+            "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages": "",
+            "/tenantrelationships/managedtenants/conditionalaccesspolicycoverages/{id}": ""
+          }
+        }
+      ],
+      "provisioningInfo": {
+        "ownerSecurityGroup": "idappcore"
+      }
+    },
+    "Application.ReadWrite.OwnedBy": {
+      "schemes": {
+        "Application": {
+          "adminDisplayName": "Manage apps that this app creates or owns",
+          "adminDescription": "Allows the app to create other applications, and fully manage those applications (read, update, update application secrets and delete), without a signed-in user.  It cannot update any apps that it is not an owner of.",
+          "requiresAdminConsent": false
+        }
+      },
+      "pathSets": [
+        {
+          "methods": [
+            "DELETE",
+            "GET"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications/{id}/extensionproperties/{id}": "least=Application",
+            "/directory/deleteditems/{id}": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications(appid={value})/addkey": "",
+            "/applications(appid={value})/addpassword": "",
+            "/applications(appid={value})/removekey": "",
+            "/applications(appid={value})/removepassword": "",
+            "/applications/{id}/addkey": "least=Application",
+            "/applications/{id}/addpassword": "least=Application",
+            "/applications/{id}/removekey": "least=Application",
+            "/applications/{id}/removepassword": "least=Application",
+            "/applications/{id}/synchronization/acquireaccesstoken": "least=Application",
+            "/applicationtemplates/{id}/instantiate": "least=Application",
+            "/directory/deleteditems/{id}/restore": "least=Application",
+            "/serviceprincipals(appid={value})/addkey": "",
+            "/serviceprincipals(appid={value})/addpassword": "",
+            "/serviceprincipals(appid={value})/addtokensigningcertificate": "",
+            "/serviceprincipals(appid={value})/claimsmappingpolicies": "",
+            "/serviceprincipals(appid={value})/getpasswordsinglesignoncredentials": "",
+            "/serviceprincipals(appid={value})/homerealmdiscoverypolicies": "",
+            "/serviceprincipals(appid={value})/owners": "",
+            "/serviceprincipals(appid={value})/removekey": "",
+            "/serviceprincipals(appid={value})/removepassword": "",
+            "/serviceprincipals/{id}/addkey": "least=Application",
+            "/serviceprincipals/{id}/addpassword": "least=Application",
+            "/serviceprincipals/{id}/addtokensigningcertificate": "least=Application",
+            "/serviceprincipals/{id}/getpasswordsinglesignoncredentials": "least=Application",
+            "/serviceprincipals/{id}/removekey": "least=Application",
+            "/serviceprincipals/{id}/removepassword": "least=Application",
+            "/serviceprincipals/{id}/synchronization/acquireaccesstoken": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/pause": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/provisionondemand": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/restart": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/directories/{id}/discover": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/parseexpression": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/start": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/validatecredentials": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates/{id}/schema/parseexpression": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications/{id}/synchronization/templates": "least=Application",
+            "/applications/{id}/synchronization/templates/{id}/schema/filteroperators": "least=Application",
+            "/applications/{id}/synchronization/templates/{id}/schema/functions": "least=Application",
+            "/applications/delta": "",
+            "/serviceprincipals/{id}/approleassignedto": "",
+            "/serviceprincipals/{id}/approleassignments": "",
+            "/serviceprincipals/{id}/createdobjects": "",
+            "/serviceprincipals/{id}/delegatedpermissionclassifications": "",
+            "/serviceprincipals/{id}/memberof": "",
+            "/serviceprincipals/{id}/ownedobjects": "",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/filteroperators": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/schema/functions": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates/{id}": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates/{id}/schema": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates/{id}/schema/filteroperators": "least=Application",
+            "/serviceprincipals/{id}/synchronization/templates/{id}/schema/functions": "least=Application",
+            "/serviceprincipals/delta": ""
+          }
+        },
+        {
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications": "least=Application",
+            "/applications(appid={value})/federatedidentitycredentials": "",
+            "/applications(appid={value})/owners": "",
+            "/applications(appid={value})/tokenissuancepolicies": "",
+            "/applications/{id}/extensionproperties": "least=Application",
+            "/applications/{id}/federatedidentitycredentials": "least=Application",
+            "/applications/{id}/owners": "least=Application",
+            "/applications/{id}/tokenissuancepolicies": "",
+            "/serviceprincipals": "least=Application",
+            "/serviceprincipals/{id}/claimsmappingpolicies": "",
+            "/serviceprincipals/{id}/homerealmdiscoverypolicies": "",
+            "/serviceprincipals/{id}/owners": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "DELETE",
+            "GET",
+            "PATCH"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications(appid={value})": "",
+            "/applications(appid={value})/federatedidentitycredentials/{id}": "",
+            "/applications/{id}": "least=Application",
+            "/applications/{id}/federatedidentitycredentials/{id}": "least=Application",
+            "/serviceprincipals(appid={value})": "",
+            "/serviceprincipals/{id}": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications(appid={value})/owners/{id}": "",
+            "/applications/{id}/owners/{id}": "least=Application",
+            "/applications/{id}/tokenissuancepolicies/{id}": "",
+            "/serviceprincipals(appid={value})/claimsmappingpolicies/{id}": "",
+            "/serviceprincipals(appid={value})/homerealmdiscoverypolicies/{id}": "",
+            "/serviceprincipals/{id}/claimsmappingpolicies/{id}": "",
+            "/serviceprincipals/{id}/homerealmdiscoverypolicies/{id}": "",
+            "/serviceprincipals/{id}/owners/{id}": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "DELETE",
+            "GET",
+            "POST"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications(appid={value})/tokenlifetimepolicies": "",
+            "/applications/{id}/tokenlifetimepolicies": "",
+            "/serviceprincipals(appid={value})/tokenlifetimepolicies": "",
+            "/serviceprincipals/{id}/tokenlifetimepolicies": ""
+          }
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications(appid={value})/logo": "",
+            "/applications/{id}/logo": "",
+            "/serviceprincipals/{id}/synchronization/secrets": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "DELETE",
+            "GET",
+            "PUT"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications/{id}/synchronization/templates/{id}/schema": "least=Application",
+            "/serviceprincipals/{id}/synchronization/jobs/{id}/schema": "least=Application"
+          }
+        },
+        {
+          "methods": [
+            "GET",
+            "PATCH"
+          ],
+          "schemeKeys": [
+            "Application"
+          ],
+          "paths": {
+            "/applications/{id}/synchronization/templates/{id}": "least=Application"
+          }
+        }
+      ],
+      "provisioningInfo": {
+        "ownerSecurityGroup": "IdentityReq"
+      }
+    },
+    "AppRoleAssignment.ReadWrite.All": {
+      "schemes": {
+        "Application": {
+          "adminDisplayName": "Manage app permission grants and app role assignments",
+          "adminDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, without a signed-in user.",
+          "requiresAdminConsent": false
+        },
+        "DelegatedWork": {
+          "adminDisplayName": "Manage app permission grants and app role assignments",
+          "adminDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, on behalf of the signed-in user.",
+          "userDisplayName": "Manage app permission grants and app role assignments",
+          "userDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, on your behalf.",
+          "requiresAdminConsent": true
+        }
+      },
+      "pathSets": [
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/groups/{id}/approleassignments/{id}": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/approleassignedto/{id}": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/approleassignments/{id}": "least=DelegatedWork,Application",
+            "/users/{id}/approleassignments/{id}": "least=DelegatedWork,Application"
+          }
+        },
+        {
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/groups/{id}/approleassignments": "least=DelegatedWork,Application",
+            "/users/{id}/approleassignments": "least=DelegatedWork,Application"
+          }
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/me/approleassignedresources": "",
+            "/users/{id}/approleassignedresources": ""
+          }
+        },
+        {
+          "methods": [
+            "POST"
+          ],
+          "schemeKeys": [
+            "Application",
+            "DelegatedWork"
+          ],
+          "paths": {
+            "/serviceprincipals(appid={value})/approleassignedto": "",
+            "/serviceprincipals(appid={value})/approleassignments": "",
+            "/serviceprincipals/{id}/approleassignedto": "least=DelegatedWork,Application",
+            "/serviceprincipals/{id}/approleassignments": "least=DelegatedWork,Application"
+          }
+        }
+      ],
+      "provisioningInfo": {
+        "ownerSecurityGroup": "IdentityReq"
+      }
+    }
+  }
+}

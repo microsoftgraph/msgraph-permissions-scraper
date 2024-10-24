@@ -83,6 +83,11 @@ namespace PermissionsScraper.Common
         public string[] ApiVersions { get; set; }
 
         /// <summary>
+        /// If true, fetches permissions descriptions from service principal and not workloads permissions file
+        /// </summary>
+        public bool UseServicePrincipalPermissionDescriptions { get; set; } = true;
+
+        /// <summary>
         /// The name of the GitHub app
         /// </summary>
         public string GitHubAppName { get; set; }
@@ -105,7 +110,7 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// The remote branch where commits are made into
         /// </summary>
-        public string WorkingBranch { get; set; }
+        public Dictionary<string, string> WorkingBranches { get; set; }
 
         /// <summary>
         /// The remote branch which is the base reference of the <see cref="WorkingBranch"/>
@@ -115,27 +120,22 @@ namespace PermissionsScraper.Common
         /// <summary>
         /// The file path of a file content in a repository branch
         /// </summary>
-        public string FileContentPath { get; set; }
-
-        /// <summary>
-        /// The string contents of a file in a respository branch
-        /// </summary>
-        public string FileContent { get; set; }
+        public Dictionary<string, string> FileContentPaths { get; set; }
 
         /// <summary>
         /// The commit message
         /// </summary>
-        public string CommitMessage { get; set; }
+        public Dictionary<string, string> CommitMessages { get; set; }
 
         /// <summary>
         /// Pull request title
         /// </summary>
-        public string PullRequestTitle { get; set; }
+        public Dictionary<string, string> PullRequestTitles { get; set; }
 
         /// <summary>
         /// Pull request message
         /// </summary>
-        public string PullRequestBody { get; set; }
+        public Dictionary<string, string> PullRequestBodies { get; set; }
 
         /// <summary>
         /// List of pull request reviewers
@@ -171,4 +171,3 @@ namespace PermissionsScraper.Common
         }
     }
 }
-

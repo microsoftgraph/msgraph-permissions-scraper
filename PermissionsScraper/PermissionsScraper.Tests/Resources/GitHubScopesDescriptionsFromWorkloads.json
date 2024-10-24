@@ -1,0 +1,62 @@
+{
+  "DelegatedWork": [
+    {
+      "value": "Application.Read.All",
+      "adminDisplayName": "Read applications",
+      "adminDescription": "Allows the app to read applications and service principals on behalf of the signed-in user.",
+      "consentDisplayName": "Read applications",
+      "consentDescription": "Allows the app to read applications and service principals on your behalf.",
+      "isAdmin": true,
+      "isHidden": false
+    },
+    {
+      "value": "AppRoleAssignment.ReadWrite.All",
+      "adminDisplayName": "Manage app permission grants and app role assignments",
+      "adminDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, on behalf of the signed-in user.",
+      "consentDisplayName": "Manage app permission grants and app role assignments",
+      "consentDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, on your behalf.",
+      "isAdmin": true,
+      "isHidden": false
+    }
+  ],
+  "DelegatedPersonal": [
+    {
+      "value": "Application.Read.All",
+      "adminDisplayName": "Read applications",
+      "adminDescription": "Allows the app to read applications and service principals on behalf of the signed-in user.",
+      "consentDisplayName": "Read applications",
+      "consentDescription": "Allows the app to read applications and service principals on your behalf.",
+      "isAdmin": true,
+      "isHidden": false
+    }
+  ],
+  "Application": [
+    {
+      "value": "Application.Read.All",
+      "adminDisplayName": "Read all applications",
+      "adminDescription": "Allows the app to read all applications and service principals without a signed-in user.",
+      "consentDisplayName": null,
+      "consentDescription": null,
+      "isAdmin": false,
+      "isHidden": false
+    },
+    {
+      "value": "Application.ReadWrite.OwnedBy",
+      "adminDisplayName": "Manage apps that this app creates or owns",
+      "adminDescription": "Allows the app to create other applications, and fully manage those applications (read, update, update application secrets and delete), without a signed-in user.  It cannot update any apps that it is not an owner of.",
+      "consentDisplayName": null,
+      "consentDescription": null,
+      "isAdmin": false,
+      "isHidden": false
+    },
+    {
+      "value": "AppRoleAssignment.ReadWrite.All",
+      "adminDisplayName": "Manage app permission grants and app role assignments",
+      "adminDescription": "Allows the app to manage permission grants for application permissions to any API (including Microsoft Graph) and application assignments for any app, without a signed-in user.",
+      "consentDisplayName": null,
+      "consentDescription": null,
+      "isAdmin": false,
+      "isHidden": false
+    }
+  ]
+}
