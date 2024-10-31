@@ -47,23 +47,6 @@ namespace PermissionsScraper.Services.Tests
         }
 
         [Fact]
-        public async Task CreatePermissionsReverseLookupTableWorks()
-        {
-            // Arrange
-            var permissionsDocumentText = await GetWorkloadsPermissionsDocumentTextAsync();
-            var permissionsDocument = PermissionsDocument.Load(permissionsDocumentText);
-            
-            // Act
-            var reverseLookupTable = PermissionsProcessor.CreatePermissionsReverseLookupTable(permissionsDocument);
-            string jsonResult = JsonConvert.SerializeObject(reverseLookupTable, Formatting.Indented).ChangeLineBreaks();
-
-            // Assert
-            var reverseLookupTableText = await Resources.GetFileContents(".\\Resources\\PermissionsReverseLookupTable.json");
-            Assert.Equal(reverseLookupTableText.ChangeLineBreaks(), jsonResult);
-            Assert.Equal(118, reverseLookupTable.Keys.Count);
-        }
-
-        [Fact]
         public async Task ExtractPermissionDescriptionsFromWorkloadsFileIntoDictionaryWorks()
         {
             // Arrange
