@@ -17,68 +17,78 @@ trigger:
 pr: none
 
 variables:
-  # Function app name
   functionAppName: 'permissionscraper'
-
-  # Agent VM image name
-  vmImageName: 'vs2017-win2016'
-
-  # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/PermissionsScraper/PermissionsScraper'
-
-stages:
-- stage: Build
-  displayName: Build stage
-
-  jobs:
-  - job: Build
-    displayName: Build
+  
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+    
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
     pool:
-      vmImage: $(vmImageName)
+      name: Azure-Pipelines-1ESPT-ExDShared
+      image: windows-latest
+      os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
+    stages:
+    - stage: Build
+      displayName: Build stage
 
-    steps:
-    - checkout: self
-      submodules: true
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: 'build'
-        projects: |
-          $(workingDirectory)/PermissionsScraper.csproj
-        arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
+      jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
 
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
+        steps:
+        - checkout: self
+          submodules: true
+        - task: DotNetCoreCLI@2
+          displayName: Build
+          inputs:
+            command: 'build'
+            projects: |
+              $(workingDirectory)/PermissionsScraper.csproj
+            arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
 
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      artifact: drop
+        - task: ArchiveFiles@2
+          displayName: 'Archive files'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
+            includeRootFolder: false
+            archiveType: zip
+            archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+            replaceExistingArchive: true
 
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-  condition: succeeded()
+        - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+          artifact: drop
 
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
-    pool:
-      vmImage: $(vmImageName)
+    - stage: Deploy
+      displayName: Deploy stage
+      dependsOn: Build
+      condition: succeeded()
 
-    strategy:
-      runOnce:
-        deploy:
+      jobs:
+      - deployment: Deploy
+        displayName: Deploy
+        environment: 'development'
+        pool:
+          vmImage: $(vmImageName)
 
-          steps:
-          - task: AzureFunctionApp@1
-            inputs:
-              azureSubscription: 'GraphExplorer-API-ARM'
-              appType: 'functionApp'
-              appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+        strategy:
+          runOnce:
+            deploy:
+
+              steps:
+              - task: AzureFunctionApp@1
+                inputs:
+                  azureSubscription: 'GraphExplorer-API-ARM'
+                  appType: 'functionApp'
+                  appName: $(functionAppName)
+                  package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'

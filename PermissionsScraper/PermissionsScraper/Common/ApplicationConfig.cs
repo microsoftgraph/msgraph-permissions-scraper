@@ -83,6 +83,11 @@ namespace PermissionsScraper.Common
         public string[] ApiVersions { get; set; }
 
         /// <summary>
+        /// If true, fetches permissions descriptions from service principal and not workloads permissions file
+        /// </summary>
+        public bool UseServicePrincipalPermissionDescriptions { get; set; } = true;
+
+        /// <summary>
         /// The name of the GitHub app
         /// </summary>
         public string GitHubAppName { get; set; }
@@ -113,9 +118,14 @@ namespace PermissionsScraper.Common
         public string ReferenceBranch { get; set; }
 
         /// <summary>
-        /// The file path of a file content in a repository branch
+        /// The file path of the descriptions file content in a repository branch
         /// </summary>
-        public string FileContentPath { get; set; }
+        public string DescriptionsFileContentPath { get; set; }
+
+        /// <summary>
+        /// The file path of the permissions file content in a repository branch
+        /// </summary>
+        public string PermissionsFileContentPath { get; set; }
 
         /// <summary>
         /// The string contents of a file in a respository branch
@@ -171,4 +181,3 @@ namespace PermissionsScraper.Common
         }
     }
 }
-

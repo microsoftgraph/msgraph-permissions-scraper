@@ -2,9 +2,10 @@
 //  Copyright (c) Microsoft Corporation.  All Rights Reserved.  Licensed under the MIT License.  See License in the project root for license information.
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using PermissionsScraper.Common;
+using PermissionsScraper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,10 @@ namespace PermissionsScraper.Services
 {
     internal class PermissionsProcessor
     {
+        private const string DelegatedWork = "DelegatedWork";
+        private const string DelegatedPersonal = "DelegatedPersonal";
+        private const string Application = "Application";
+
         /// <summary>
         /// Extracts permissions descriptions from a string input source
         /// and adds them to a target permissions descriptions dictionary.
@@ -34,6 +39,54 @@ namespace PermissionsScraper.Services
                 : JsonConvert.DeserializeObject<JObject>(permissionsDescriptionsText).Value<JArray>(topLevelDictionaryName)?.First;
 
             ExtractPermissionsDescriptionsIntoDictionary(scopesNames, permissionsDescriptionsToken, ref referencePermissionsDictionary);
+        }
+
+        /// <summary>
+        /// Extracts permissions descriptions from schemes source and adds them to a target permissions descriptions dictionary.
+        /// </summary>
+        /// <param name="permissionsDocument">The <see cref="PermissionsDocument"/> input with permissions descriptions.</param>
+        /// <returns>A dictionary of all permissions grouped by permission scheme.</returns>
+        public static Dictionary<string, List<ScopeInformation>> ExtractPermissionDescriptionsIntoDictionary(
+            PermissionsDocument permissionsDocument)
+        {
+            UtilityFunctions.CheckArgumentNull(permissionsDocument, nameof(permissionsDocument));
+
+            var permissionDescriptions = new Dictionary<string, List<ScopeInformation>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { DelegatedWork, new List<ScopeInformation>() },
+                { DelegatedPersonal, new List<ScopeInformation>() },
+                { Application, new List<ScopeInformation>() }
+            };
+
+            foreach (var permission in permissionsDocument.Permissions)
+            {
+                foreach (var schemesDescriptions in permission.Value.Schemes)
+                {
+                    if (!permissionDescriptions.TryGetValue(schemesDescriptions.Key, out var allSchemePermissions))
+                    {
+                        throw new InvalidOperationException($"Invalid scheme key {schemesDescriptions.Key}");
+                    }
+
+                    var scopeInformation = new ScopeInformation()
+                    {
+                        ScopeName = permission.Key,
+                        AdminDisplayName = schemesDescriptions.Value.AdminDisplayName,
+                        AdminDescription = schemesDescriptions.Value.AdminDescription,
+                        ConsentDisplayName = schemesDescriptions.Value.UserDisplayName,
+                        ConsentDescription = schemesDescriptions.Value.UserDescription,
+                        IsAdmin = schemesDescriptions.Value.RequiresAdminConsent,
+                        IsHidden = permission.Value.ProvisioningInfo.IsHidden
+                    };
+                    allSchemePermissions.Add(scopeInformation);
+                }
+            }
+
+            foreach (var schemeScopes in permissionDescriptions.Values)
+            {
+                schemeScopes.Sort((x, y) => x.ScopeName.CompareTo(y.ScopeName));
+            }
+
+            return permissionDescriptions;
         }
 
         /// <summary>
